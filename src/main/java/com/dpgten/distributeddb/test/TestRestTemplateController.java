@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,33 @@ import java.util.Arrays;
 
 @RestController(value = "/rest")
 public class TestRestTemplateController {
+
+    private String baseURL;
+
+    @Value("${application.instance.type}")
+    private Integer instanceType;
+
+    @Value("${api.host.baseurl.instanceOne}")
+    private String baseURLOne;
+
+    @Value("${api.host.baseurl.instanceTwo}")
+    private String baseURLTwo;
+
+    private String localURL = "http://localhost:8087";
+
+    TestRestTemplateController(){
+        System.out.println("We are in the instance number--> " + instanceType);
+        if(instanceType ==1){
+            baseURL = baseURLTwo;
+        }
+        else if(instanceType == 2){
+            baseURL = baseURLOne;
+        }
+        else{
+            baseURL = localURL;
+        }
+        System.out.println("Base URL is--> " + baseURL);
+    }
 
     @Autowired
     RestTemplate restTemplate;
@@ -33,13 +61,13 @@ public class TestRestTemplateController {
     @RequestMapping(value = "/template/get", method = RequestMethod.GET)
     public String getProducts() {
 //        RestTemplate restTemplate = new RestTemplate();
-        String fooResourceUrl  = "http://localhost:8087/test/get";
+        String fooResourceUrl  =  baseURL +"/test/get";
         ResponseEntity<String> response
                 = restTemplate.getForEntity(fooResourceUrl , String.class);
 //    Assertions.assertEquals(response.getStatusCode(), HttpStatus.OK);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = null;
-        String result = "";
+//        ObjectMapper mapper = new ObjectMapper();
+//        JsonNode root = null;
+//        String result = "";
         String responseStr ="";
         try {
             responseStr = response.getBody();
