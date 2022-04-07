@@ -3,7 +3,7 @@
 Data Manage& Analytics course Winter 2022
 Team dpg-10 project
 
-## Getting started
+## Git Steps
 
 To make it easy for you to get started with GitLab, here's a list of recommended next steps.
 
