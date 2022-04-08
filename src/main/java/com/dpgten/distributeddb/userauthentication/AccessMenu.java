@@ -4,11 +4,18 @@ import java.util.Scanner;
 
 import static com.dpgten.distributeddb.userauthentication.LoginMenu.USER_NAME;
 
-
+/**
+ * Access Menu for selection
+ * @author DMWA group 10
+ */
 public class AccessMenu {
     private static final Scanner scanner = new Scanner(System.in);
     public static String DATABASE_ACCESS_NAME;
 
+    /**
+     * Provides the menu after login calling from login menu
+     * Database selection is optional
+     */
     public static void openAccessMenu() {
         if (USER_NAME != null) {
             System.out.println("============= SELECT ONE OPTION ============");
