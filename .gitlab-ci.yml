@@ -8,9 +8,3 @@ maven-build:
         build
     script:
         - mvn compile -B
-    only:
-        refs:
-            - main
-            - feature-merged
-            - develop
-            - merge_requests
