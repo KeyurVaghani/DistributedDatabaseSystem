@@ -1,4 +1,4 @@
-package com.dpgten.distributeddb.test;
+package com.dpgten.distributeddb.access;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
