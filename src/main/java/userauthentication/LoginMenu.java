@@ -3,17 +3,29 @@ package userauthentication;
 import java.io.*;
 import java.util.Scanner;
 
+/**
+ * Authentication Login Menus
+ * @author DMWA Group 10
+ */
 public class LoginMenu {
     private final Scanner scanner;
     public static String USER_NAME;
     File file;
 
+    /**
+     * Default Constructor
+     */
     public LoginMenu() {
         scanner = new Scanner(System.in);
         System.out.println("============ WELCOME ==========");
         file = new File("UserProfiles.txt");
     }
 
+    /**
+     * Displays first selection menu.
+     * @throws IOException handles the file not found etc.
+     * @throws InterruptedException handles the interruption errors.
+     */
     void userFirstMenu() throws IOException, InterruptedException {
         System.out.println("========== USER SELECTION =========");
         System.out.println("1. User Login\n2. New User? Register\n3. Exit");
@@ -22,6 +34,12 @@ public class LoginMenu {
         userMainMenu(selectUser);
     }
 
+    /**
+     * Displays second menu according choice
+     * @param selectUser provides user choice
+     * @throws IOException handles the file not found etc.
+     * @throws InterruptedException handles the interruption errors.
+     */
     void userMainMenu(String selectUser) throws IOException, InterruptedException {
         switch (selectUser) {
             case "1":
@@ -53,8 +71,9 @@ public class LoginMenu {
                 System.out.print("Password: ");
                 userPassword = scanner.nextLine();
 
-                // TODO: SHA Algorithm check
-
+                /*
+                 * TODO SHA Algorithm check
+                 */
 //                try {
 //                    userPassword=AlgorithmHashSHA.getSHA256Hash(userPassword);
 //                } catch (NoSuchAlgorithmException e) {
@@ -77,6 +96,13 @@ public class LoginMenu {
         }
     }
 
+    /**
+     * Validates user login page
+     * @param userPassword passed from the userMainMenu
+     * @param securityAnswer passed from previous menu
+     * @throws IOException handles the file not found etc.
+     * @throws InterruptedException handles the interruption errors.
+     */
     void userLoginChecker(String userPassword, String securityAnswer) throws IOException, InterruptedException {
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
         String lineSingleUser;
@@ -106,6 +132,12 @@ public class LoginMenu {
         }
     }
 
+    /**
+     * Adds the user info from registration input method
+     * @param userPassword passed from user main menu
+     * @param securityAnswer passed from previous method
+     * @throws IOException handles the file not found etc.
+     */
     void userRegistrationAddFile(String userPassword, String securityAnswer) throws IOException {
         PrintWriter printWriter = new PrintWriter(new BufferedWriter(new FileWriter(file,true)));
         printWriter.println(USER_NAME + " | " + userPassword + " | " + securityAnswer);
@@ -135,9 +167,13 @@ public class LoginMenu {
         //adding menu class after login
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        LoginMenu lm = new LoginMenu();
-        lm.userFirstMenu();
-    }
+    /*
+     * Check with main
+     */
+//
+//    public static void main(String[] args) throws IOException, InterruptedException {
+//        LoginMenu lm = new LoginMenu();
+//        lm.userFirstMenu();
+//    }
 }
 
