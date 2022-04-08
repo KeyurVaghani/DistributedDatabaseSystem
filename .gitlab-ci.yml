@@ -1,0 +1,16 @@
+stages:
+    - build
+
+maven-build:
+    image: 
+        maven:3-jdk-8
+    stage: 
+        build
+    script:
+        - mvn compile -B
+    only:
+        refs:
+            - main
+            - feature-merged
+            - develop
+            - merge_requests
