@@ -164,7 +164,7 @@ public class LoginMenu {
     }
 
     void afterLoginMenu() {
-        //adding menu class after login
+        AccessMenu.openAccessMenu();
     }
 
     /*
