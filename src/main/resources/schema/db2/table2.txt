@@ -1,0 +1,7 @@
+Primary_key|Sno
+Column|Sno|Sname|SMarks
+Row|1|Adarsh1|89
+Row|2|Gandhi1|86
+Row|3|Sai1|80
+Row|4|Prakrut1|83
+Row|5|Keyur1|81
