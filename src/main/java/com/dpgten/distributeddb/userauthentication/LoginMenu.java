@@ -1,4 +1,4 @@
-package userauthentication;
+package com.dpgten.distributeddb.userauthentication;
 
 import java.io.*;
 import java.util.Scanner;
