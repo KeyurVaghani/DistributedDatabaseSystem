@@ -70,8 +70,8 @@ public class LoginMenu {
                     } else {
                         System.out.println("Calling query executor");
                         QueryImpl queryImpl = new QueryImpl();
-                        queryImpl.executeQuery(user);
-                        loopCheck = false;
+                        loopCheck = queryImpl.executeQuery(user);
+//                        loopCheck = false;
                     }
                     break;
                 case "2":
@@ -188,7 +188,7 @@ public class LoginMenu {
     public boolean logout() {
         user.setLoggedIn("N");
         // write code to update file.
-        System.out.println("Logging out, Have a great day.");
+        System.out.println("\nLogging out, Have a great day.");
         return false;
     }
 
