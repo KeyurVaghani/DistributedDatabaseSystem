@@ -24,6 +24,10 @@ public class QueryValidator {
         return INSERT_TABLE_PATTERN.matcher(inputQuery).find();
     }
 
+    public boolean isUpdateQuery(String inputQuery){
+        return UPDATE_TABLE_PATTERN.matcher(inputQuery).find();
+    }
+
     public boolean isWhereCondition(String inputQuery){
         return WHERE_CONDITION_PATTERN.matcher(inputQuery).find();
     }

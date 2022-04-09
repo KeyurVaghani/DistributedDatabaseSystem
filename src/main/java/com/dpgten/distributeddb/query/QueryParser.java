@@ -22,6 +22,10 @@ public class QueryParser {
     public static String SELECT_TABLE_WHERE = "SELECT\\s+((\\*)?((\\w+)?((,(\\w+))*)?))\\s+FROM\\s+(\\w+)";
     public static final Pattern SELECT_TABLE_WHERE_PATTERN = Pattern.compile(SELECT_TABLE_WHERE);
 
+    public static String UPDATE_TABLE = "UPDATE\\s+TABLE\\s+(\\w+)\\s+SET\\s+(\\w+)\\s+=\\s+(\\w+)\\s*" +
+            "(WHERE\\s+(\\w+)\\s+=\\s+(\\w+))*;";
+    public static final Pattern UPDATE_TABLE_PATTERN = Pattern.compile(UPDATE_TABLE);
+
     public static String WHERE_CONDITION = "WHERE\\s+(\\w+)\\s+=\\s+(\\w+);";
     public static final Pattern WHERE_CONDITION_PATTERN = Pattern.compile(WHERE_CONDITION);
 
