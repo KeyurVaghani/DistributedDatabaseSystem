@@ -10,8 +10,11 @@ public class SqlDump {
 
     private final String schema = "schema";
     private final String primarykey = "Sno";
-    private final String delimeter1= "\\|";
-    private final String delimeter2="~";
+    private final String delimeter1 = "\\|";
+    private final String DELIMETER_COMMA = ",";
+    private final String delimeter2 = "~";
+    private final String NEW_LINE = "\n";
+    private final String SEMI_COLON = ";";
 
     //RENAME VARIABLES
     public void readFile() throws IOException {
@@ -19,47 +22,59 @@ public class SqlDump {
 
 
         String[] databaseList = obj.list();
+        StringBuilder builder = new StringBuilder();
+        ArrayList<String> databaseCheckerList = new ArrayList<>();
         for (int i = 0; i < databaseList.length; i++) {
-
-            System.out.println("CREATE DATABASE "+databaseList[i]);
-            //System.out.println(databaseList[i]);
+            if (!databaseCheckerList.contains(databaseList[i])) {
+                builder.append("CREATE DATABASE " + databaseList[i] + SEMI_COLON + NEW_LINE);
+                databaseCheckerList.add(databaseList[i]);
+            }
             String column = schema + "//" + databaseList[i];
             File tableList = getFileResource(column);
             String[] tableIterate = tableList.list();
             for (int j = 0; j < tableIterate.length; j++) {
-                InputStream table = getFileFromResourceAsStream(column + "//"+tableIterate[j]);
-                    String tableName=tableIterate[j];
-                    //System.out.println(tableName);
-                    System.out.println("CREATE TABLE "+tableName);
-                    InputStreamReader inputStreamReader= new InputStreamReader(table,StandardCharsets.UTF_8);
-                    BufferedReader bufferedReader= new BufferedReader(inputStreamReader);
-                    //need to change this for loop into normal one..it uses lombok
-                    String Primary_Key=bufferedReader.readLine();
-                    System.out.println(Primary_Key);
-                    String col= bufferedReader.readLine();
-                    System.out.println(col);
-                    //readline
-                   // bufferedReader.lines().forEach(line-> {
-                        //System.out.println(line);
-                        //String[] lineSplit= line.split(delimeter1);
-
-//                        for(int z=0;z<lineSplit.length;z++) {
-//
-//                                if (lineSplit[0].contains("Column")) {
-//                                    ArrayList<String> col = new ArrayList<String>();
-//                                    System.out.println(col.add(lineSplit[z]));
-//                                }
-//                                final StringBuilder insertBuilder= new StringBuilder();
-//                                System.out.println(lineSplit[z]);
-//                                if(lineSplit[z].equals(primarykey))
-//                                {
-//                                     }
-//
-//                        }
-                        }
-                   // );}
+                InputStream table = getFileFromResourceAsStream(column + "//" + tableIterate[j]);
+                String tableName = tableIterate[j];
+                tableName = tableName.substring(0, tableName.length() - 4);
+                InputStreamReader inputStreamReader = new InputStreamReader(table, StandardCharsets.UTF_8);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String primaryKey = bufferedReader.readLine().split(delimeter1)[1];
+                //add logic to add foreign key inside create table
+                String foreignKey = bufferedReader.readLine();
+                String[] columnList = bufferedReader.readLine().split(delimeter1);
+                ArrayList<String> columnNames = new ArrayList<String>();
+                ArrayList<String> columnDataTypes = new ArrayList<String>();
+                for (int index = 1; index < columnList.length; index++) {
+                    String[] temp = columnList[index].split(DELIMETER_COMMA);
+                    columnNames.add(temp[0].trim());
+                    columnDataTypes.add(temp[1].trim());
                 }
+                String prefix = "";
+                builder.append("CREATE TABLE " + tableName + "( ");
+                for (int index = 0; index < columnNames.size(); index++) {
+                    builder.append(prefix);
+                    builder.append(columnNames.get(index)).append(" ").append(columnDataTypes.get(index));
+                    prefix = ", ";
+                }
+                builder.append(");\n");
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    String[] rowData = line.split(delimeter1);
+                    String insertQuery = "INSERT INTO " + tableName + " VALUES(";
+                    prefix = "";
+                    for (int index = 1; index < rowData.length; index++) {
+                        insertQuery += prefix;
+                        insertQuery += rowData[index];
+                        prefix = ",";
+                    }
+                    insertQuery += ");\n";
+                    builder.append(insertQuery);
+                }
+
+            }
         }
+        System.out.println(builder);
+    }
 
 
     public File getFileResource(String fileName) {
