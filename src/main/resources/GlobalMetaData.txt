@@ -1,1 +1,3 @@
-server2|keyur|student
+VM1|db1|tb1
+VM1|db2|tb2
+VM2|db1|tb3
