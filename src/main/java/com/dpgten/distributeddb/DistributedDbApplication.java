@@ -13,17 +13,22 @@ import java.io.IOException;
 public class DistributedDbApplication {
 
 	public static void main(String[] args) throws IOException {
-		SqlDump sqlDump= new SqlDump();
-		sqlDump.readFile();
+
 
 		SpringApplication.run(DistributedDbApplication.class, args);
+
+		// Entry point to application
+		LoginMenu lm = new LoginMenu();
+		lm.userFirstMenu();
 
 //		QueryImpl implement = new QueryImpl();
 //		User user = new User("karthik","kanna","","","","db1");
 //		implement.executeQuery(user);
 
-		LoginMenu lm = new LoginMenu();
-        lm.userFirstMenu();
+
+		// need to integrate saving to SQL File
+//		SqlDump sqlDump= new SqlDump();
+//		sqlDump.readFile();
 	}
 
 }
