@@ -5,41 +5,63 @@ import com.dpgten.distributeddb.utils.MetadataUtils;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
-import static com.dpgten.distributeddb.query.QueryParser.INSERT_TABLE_PATTERN;
-import static com.dpgten.distributeddb.query.QueryParser.SELECT_TABLE_PATTERN;
+import static com.dpgten.distributeddb.query.QueryParser.*;
 import static com.dpgten.distributeddb.utils.Utils.*;
 
 public class TableQuery {
 
     public void selectRows(String inputQuery){
         Matcher selectRowsMatcher = SELECT_TABLE_PATTERN.matcher(inputQuery);
-        String tableName = "";
         String tablePath = "";
 
         if(selectRowsMatcher.find()){
             MetadataUtils mdUtils = new MetadataUtils();
-            tableName = selectRowsMatcher.group(8);
-            tablePath = mdUtils.getTablePath(tableName);
+            tablePath = mdUtils.getTablePath(selectRowsMatcher.group(8));
         }
         File tableFile = new File(tablePath);
 
-        if(!selectRowsMatcher.group(9).isEmpty()){
+        if(selectRowsMatcher.group(9) != null){
             String columnName = selectRowsMatcher.group(10);
             String columnValue = selectRowsMatcher.group(11);
-            List<String> selectRows = executeWhere(tableFile,columnName,columnValue);
+            List<String> selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
+            selectRows.forEach(System.out::println);
+        }
+    }
+
+    public void updateRow(String inputQuery){
+        Matcher updateQueryMatcher = UPDATE_TABLE_PATTERN.matcher(inputQuery);
+        String tablePath = "";
+
+        if(updateQueryMatcher.find()){
+            MetadataUtils mdUtils = new MetadataUtils();
+            tablePath = mdUtils.getTablePath(updateQueryMatcher.group(1));
+        }
+        File tableFile = new File(tablePath);
+        if(updateQueryMatcher.group(4) != null){
+            String columnName = updateQueryMatcher.group(5);
+            String columnValue = updateQueryMatcher.group(6);
+            List<String> selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
             selectRows.forEach(System.out::println);
         }
     }
 
     public List<String> executeWhere(File tableFile, String columnName
-            , String columnValue){
+            , String columnValue,String inputQuery){
         List<String> selectRows = new ArrayList<>();
+        String operation;
+        QueryValidator validator = new QueryValidator();
+        if(validator.isUpdateQuery(inputQuery)){
+            operation = "update";
+        }else{
+            operation = "select";
+        }
         try {
             Scanner tableScanner = new Scanner(tableFile);
             tableScanner.nextLine();
             String columnHeader = tableScanner.nextLine();
-            String[] headers = columnHeader.split("\\|");
+            String[] headers = columnHeader.split(PRIMARY_DELIMITER_REGEX);
             List<String> headerArray = new ArrayList<>();
             for(String header: headers){
                 headerArray.add(header.split(",")[0]);
@@ -48,10 +70,27 @@ public class TableQuery {
 
             while(tableScanner.hasNext()){
                 String row = tableScanner.nextLine();
-                if(row.split(",")[columnIndex].equals(columnValue)){
-                    selectRows.add(row);
+                if(row.split(PRIMARY_DELIMITER_REGEX)[columnIndex].equals(columnValue)){
+                    if(operation.equals("select")){
+                        selectRows.add(row);
+                    }else if(operation.equals("update")){
+                        Matcher updateQueryMatcher = UPDATE_TABLE_PATTERN.matcher(inputQuery);
+                        if(updateQueryMatcher.find()){
+                            String matchColumnName = updateQueryMatcher.group(2);
+                            String matchColumnValue = updateQueryMatcher.group(3);
+                            int matchColumnIndex = headerArray.indexOf(matchColumnName);
+                            String[] rowValues = row.split(PRIMARY_DELIMITER_REGEX);
+                            rowValues[matchColumnIndex] = matchColumnValue;
+                            selectRows.add(String.join(PRIMARY_DELIMITER,rowValues));
+                        }
+                    }else{
+                        if(operation.equals("update") || operation.equals("delete")){
+                            selectRows.add(row);
+                        }
+                    }
                 }
             }
+            tableScanner.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -75,7 +114,7 @@ public class TableQuery {
         Matcher createTableMatcher = QueryParser.CREATE_TABLE_PATTERN.matcher(inputQuery);
         String tableName = null;
         String tableColumn = null;
-        HashMap<String,String> tableColumnList= new HashMap<String,String>();
+        HashMap<String,String> tableColumnList= new HashMap<>();
         if(createTableMatcher.find()){
             tableName = createTableMatcher.group(1);
             tableColumn = createTableMatcher.group(2);
@@ -106,9 +145,6 @@ public class TableQuery {
                 }
             }
         }
-
-        MetadataUtils mdUtils = new MetadataUtils();
-        //todo try to put tables into the either server based on some requirements
 
         File table = new File(SCHEMA+"/"+databaseName+"/"+tableName+".txt");
 
@@ -189,7 +225,7 @@ public class TableQuery {
             for(String[] list:line) {
                 List<String> alist=Arrays.asList(list);
                bw.append("\n");
-                bw.append(alist.toString().substring(1,alist.toString().length()-1).replace(",",PRIMARY_DELIMITER));
+               bw.append(alist.stream().map(Object::toString).collect(Collectors.joining(PRIMARY_DELIMITER)));
             }
         } catch (IOException e) {
             e.printStackTrace();
