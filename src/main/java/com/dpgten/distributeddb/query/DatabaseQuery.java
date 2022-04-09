@@ -13,6 +13,29 @@ import static com.dpgten.distributeddb.utils.Utils.*;
 import static com.dpgten.distributeddb.query.QueryParser.*;
 
 public class DatabaseQuery {
+    String databasePath;
+    String databaseName;
+
+    public void createDatabase(String inputQuery){
+        Matcher createQueryMatcher = CREATE_DATABASE_PATTERN.matcher(inputQuery);
+
+        if(createQueryMatcher.find()){
+            this.databaseName = createQueryMatcher.group(1);
+
+            //todo decide in which server need to create the database
+            File database = new File(SCHEMA+"/"+databaseName);
+
+            MetadataUtils mdUtils = new MetadataUtils();
+            if(!mdUtils.isDatabaseExist(databaseName)){
+                database.mkdir();
+            }else {
+                System.out.println("database "+databaseName+" already exists");
+            }
+        }
+    }
+
+    public boolean isTableExists(String tableName){
+
     String currentUser;
     File server1;
     File server2;
@@ -158,8 +181,8 @@ public class DatabaseQuery {
 //        String currentUserPath2 = searchUser(server2,currentUser);
 
 //        if(!currentUserPath1.equals("")){
-        this.database2Path = searchDatabase(SERVER_1,databaseName);
-        if(database2Path.equals("")){
+        this.databasePath = searchDatabase(SCHEMA,databaseName);
+        if(databasePath.equals("")){
             System.out.println("Database does not exists");
             return databaseName;
         }
@@ -168,10 +191,10 @@ public class DatabaseQuery {
 //        }
 
 //        if(!currentUserPath2.equals("")){
-        this.database1Path = searchDatabase(SERVER_2,databaseName);
-        if(database1Path.equals("")){
-            System.out.println("Database does not exits");
-        }
+//        this.database1Path = searchDatabase(SERVER_2,databaseName);
+//        if(database1Path.equals("")){
+//            System.out.println("Database does not exits");
+//        }
 //        }else {
 //            System.out.println("User does not exists");
 //        }
@@ -200,13 +223,5 @@ public class DatabaseQuery {
             }
         }
         return "";
-    }
-
-    public String getDatabase1Path(){
-        return this.database1Path;
-    }
-
-    public String getDatabase2Path(){
-        return this.database2Path;
     }
 }

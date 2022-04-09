@@ -7,30 +7,31 @@ import java.util.Scanner;
 import static com.dpgten.distributeddb.utils.Utils.*;
 
 public class QueryImpl {
-    public void executeQuery(User user) {
-        System.out.println("\n"+YELLOW+"-----------------------Welcome "+ user.getUsername()+"---------------------"+RESET);
-        System.out.println(BLUE+"AUTHENTICATION SUCCESS"+RESET);
+    public void executeQuery() {
+        System.out.println(YELLOW+"-----------------------INSTANCE STARTED---------------------"+RESET);
+        System.out.println(BLUE+"AUTHENTICATION HAS BEEN SUCCESSFULLY"+RESET);
         String currentUser = "user_0";
         String currentDatabase = "";
 
-        System.out.println("\nEnter Query Here==>");
         Scanner input = new Scanner(System.in);
         String inputQuery = "y";
-        DatabaseQuery dbQuery = new DatabaseQuery(SERVER_1, SERVER_2, currentUser);
+        DatabaseQuery dbQuery = new DatabaseQuery();
         while (inputQuery.toLowerCase(Locale.ROOT).equals("y")) {
-//                inputQuery = input.nextLine();
-                inputQuery = "Delete FROM tb1 where sno = abcd;";
-            if (dbQuery.isUseQuery(inputQuery)) {
+            QueryValidator validator = new QueryValidator();
+                inputQuery = input.nextLine();
+            if (validator.isUseQuery(inputQuery)) {
                 currentDatabase = dbQuery.selectDatabase(inputQuery);
-            } else if (!currentDatabase.equals("") && dbQuery.isCreateTableQuery(inputQuery)) {
-                String database1 = dbQuery.getDatabase1Path();
-                String database2 = dbQuery.getDatabase2Path();
-                TableQuery tableQuery = new TableQuery(database1, database2);
-                tableQuery.createTable(inputQuery);
-            } else if (dbQuery.isCreateQuery(inputQuery)) {
+            } else if (!currentDatabase.equals("") && validator.isCreateTableQuery(inputQuery)) {
+                TableQuery tableQuery = new TableQuery();
+                tableQuery.createTable(inputQuery,currentDatabase);
+            } else if (!currentDatabase.equals("") && validator.isCreateQuery(inputQuery)) {
                 dbQuery.createDatabase(inputQuery);
-            }else if(dbQuery.isSelectQuery(inputQuery)){
-                dbQuery.selectRows(inputQuery);
+            }else if(!currentDatabase.equals("") && validator.isSelectQuery(inputQuery)){
+                TableQuery tblQuery = new TableQuery();
+                tblQuery.selectRows(inputQuery);
+            }else if(!currentDatabase.equals("") && validator.isInsertQuery(inputQuery)){
+                TableQuery tableQuery = new TableQuery();
+                tableQuery.insertRow(inputQuery);
             }else if(dbQuery.isDeleteQuery(inputQuery)){
                 DeleteQueryParser deleteQueryParser = new DeleteQueryParser();
                 deleteQueryParser.executeDeleteQueryWithConditionQuery(inputQuery, user);
