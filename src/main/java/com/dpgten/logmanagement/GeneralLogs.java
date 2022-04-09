@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class GeneralLogs {
 
-    private final String GENERAL_LOG_FILE_LOCATION = "src/main/resources/logs/GeneralLogs.txt";
+    private final String GENERAL_LOG_FILE_LOCATION = "src\\main\\resources\\logs\\GeneralLogs.txt";
 
     private static GeneralLogs generalLogsInstance = null;
 
