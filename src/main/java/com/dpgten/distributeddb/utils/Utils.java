@@ -11,7 +11,7 @@ public class Utils {
     public static final String SERVER1_NAME = "server1";
     public static final String SERVER2_NAME = "server2";
 
-    public static final String GLOBAL_METADATA = "src/main/resources/GlobalMetaData.txt";
+    public static final String GLOBAL_METADATA = "src//main//resources//GlobalMetaData.txt";
 
     public static final String PRIMARY_DELIMITER = "|";
     public static final String PRIMARY_DELIMITER_REGEX = "\\|";
