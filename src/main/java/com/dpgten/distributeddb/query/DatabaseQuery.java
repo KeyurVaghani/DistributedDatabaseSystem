@@ -45,6 +45,11 @@ public class DatabaseQuery {
         return queryMatcher.find();
     }
 
+    public boolean isDeleteQuery(String inputQuery){
+        Matcher queryMatcher = DELETE_QUERY_PATTERN.matcher(inputQuery);
+        return queryMatcher.find();
+    }
+
     public void createDatabase(String inputQuery){
 
         Matcher createQueryMatcher = CREATE_DATABASE_PATTERN.matcher(inputQuery);

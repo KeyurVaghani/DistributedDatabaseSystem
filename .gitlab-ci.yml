@@ -3,7 +3,7 @@ stages:
 
 maven-build:
     image: 
-        maven:3-jdk-8
+        maven:3-jdk-11
     stage: 
         build
     script:

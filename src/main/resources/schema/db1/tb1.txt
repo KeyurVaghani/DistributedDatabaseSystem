@@ -1,0 +1,4 @@
+primary_key | Name
+Column| Sno,varchar | Name,int | ID, varchar
+Row|2|keyur|S2
+Row|3|prakrut|S3

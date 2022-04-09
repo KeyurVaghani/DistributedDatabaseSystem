@@ -12,6 +12,10 @@ import java.util.List;
 @Component
 public class FileResourceUtils {
 
+    private String schemaFolderName = "schema";
+
+    private String schemaFullPath = "src//main//resources//schema.txt";
+
     public static void printInputStream(InputStream is) {
 
         try (InputStreamReader streamReader =
@@ -102,4 +106,34 @@ public class FileResourceUtils {
         }
         return null;
     }
+
+    public boolean checkIfDatabaseExists(String databaseName) {
+        boolean result = false;
+        File schemaFolder = getFileFromResource(schemaFolderName);
+        String[] databasesNamesList = schemaFolder.list((d, name) -> name.equalsIgnoreCase(databaseName));
+        if (databasesNamesList != null && databasesNamesList.length != 0) {
+            System.out.println("Database Exists");
+            result = true;
+        }
+        return result;
+    }
+
+    public boolean checkIfTableExists(String databaseName, String tableName) {
+        String finalTableName = tableName + ".txt";
+        boolean result = false;
+        File schemaFolder = getFileFromResource(schemaFolderName);
+        File[] databasesNamesList = schemaFolder.listFiles((d, name) -> name.equalsIgnoreCase(databaseName));
+        File selectedFolder = databasesNamesList[0];
+//        String  = tableName;
+        String[] tableNameList = selectedFolder.list((d, name) -> {
+            System.out.println(name);
+            return name.equalsIgnoreCase(finalTableName);
+        });
+        if (tableNameList != null && tableNameList.length != 0) {
+            System.out.println("Table Exists");
+            result = true;
+        }
+        return result;
+    }
+
 }

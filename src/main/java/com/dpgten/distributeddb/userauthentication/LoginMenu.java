@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.userauthentication;
 
+import com.dpgten.distributeddb.query.QueryImpl;
 import com.dpgten.distributeddb.utils.FileResourceUtils;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+
+import static com.dpgten.distributeddb.utils.Utils.PRIMARY_DELIMITER;
 
 /**
  * Authentication Login Menus
@@ -62,7 +65,8 @@ public class LoginMenu {
                         System.out.println("Invalid credentials/User does not exist");
                     } else {
                         System.out.println("Calling query executor");
-//                        QueryImpl queryImpl = new QueryImpl();
+                        QueryImpl queryImpl = new QueryImpl();
+                        queryImpl.executeQuery(user);
 //                        queryImpl.executeQuery();
                         loopCheck = false;
                     }
@@ -96,7 +100,7 @@ public class LoginMenu {
         BufferedReader bufferedReader = null;
         String lineSingleUser;
         boolean loginChecker = false;
-        InputStream inputStream = fileResourceUtils.getFileFromResourceAsStream(userProfile);
+        InputStream inputStream = fileResourceUtils.getFileFromResourceAsStream("UserProfiles.txt");
 //            bufferedReader = new BufferedReader(new FileReader(file));
 
         try (InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
@@ -187,7 +191,7 @@ public class LoginMenu {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            String[] lineSingleUser = line.split(delimeter);
+            String[] lineSingleUser = line.split(PRIMARY_DELIMITER);
             if (lineSingleUser.length >= 4) {
                 if (user.getUsername().equals(lineSingleUser[0])) {
                     result = true;

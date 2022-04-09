@@ -7,7 +7,10 @@ public class Utils {
 
     public static final String GLOBAL_METADATA = "src/main/java/com/dpgten/distributeddb/utils/GlobalMetaDeta.txt";
 
+    public static final String LOCAL_STORAGE_PATH = "src//main//resources//schema";
+
     public static final String PRIMARY_DELIMITER = "|";
+    public static final String PRIMARY_DELIMITER_REGEX = "\\|";
     public static final String SECONDARY_DELIMITER = ",";
 
     public static final String GREEN = "\033[0;32m";
