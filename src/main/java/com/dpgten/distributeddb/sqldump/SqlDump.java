@@ -4,11 +4,14 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class SqlDump {
 
-    private String schema = "schema";
+    private final String schema = "schema";
+    private final String primarykey = "Sno";
+    private final String delimeter1= "\\|";
+    private final String delimeter2="~";
 
     //RENAME VARIABLES
     public void readFile() throws IOException {
@@ -30,18 +33,34 @@ public class SqlDump {
                     System.out.println("CREATE TABLE "+tableName);
                     InputStreamReader inputStreamReader= new InputStreamReader(table,StandardCharsets.UTF_8);
                     BufferedReader bufferedReader= new BufferedReader(inputStreamReader);
-                    bufferedReader.lines().forEach(line-> {
+                    //need to change this for loop into normal one..it uses lombok
+                    String Primary_Key=bufferedReader.readLine();
+                    System.out.println(Primary_Key);
+                    String col= bufferedReader.readLine();
+                    System.out.println(col);
+                    //readline
+                   // bufferedReader.lines().forEach(line-> {
                         //System.out.println(line);
-                        String[] lineSplit= line.split("~");
-                        for(int z=0;z< lineSplit.length;z++) {
+                        //String[] lineSplit= line.split(delimeter1);
 
-                           // if(line)
-                            System.out.println(lineSplit[z]);
+//                        for(int z=0;z<lineSplit.length;z++) {
+//
+//                                if (lineSplit[0].contains("Column")) {
+//                                    ArrayList<String> col = new ArrayList<String>();
+//                                    System.out.println(col.add(lineSplit[z]));
+//                                }
+//                                final StringBuilder insertBuilder= new StringBuilder();
+//                                System.out.println(lineSplit[z]);
+//                                if(lineSplit[z].equals(primarykey))
+//                                {
+//                                     }
+//
+//                        }
                         }
-                    });
+                   // );}
                 }
         }
-    }
+
 
     public File getFileResource(String fileName) {
 
@@ -73,14 +92,5 @@ public class SqlDump {
 
     }
 
-//    public void printFile(File file) {
-//        List<String> lines;
-//        try {
-//            lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-//            lines.forEach(System.out::println);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }
 

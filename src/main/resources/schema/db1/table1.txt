@@ -1,7 +1,7 @@
-Primary_key~Sno
-Column~Sno~Sname~SMarks
-Row~1~Adarsh~89
-Row~2~Gandhi~86
-Row~3~Sai~80
-Row~4~Prakrut~83
-Row~5~Keyur~81
+Primary_key|Sno
+Column|Sno|Sname|SMarks
+Row|1|Adarsh|89
+Row|2|Gandhi|86
+Row|3|Sai|80
+Row|4|Prakrut|83
+Row|5|Keyur|81

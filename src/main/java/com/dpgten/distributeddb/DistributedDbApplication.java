@@ -10,8 +10,8 @@ import java.io.IOException;
 public class DistributedDbApplication {
 
 	public static void main(String[] args) throws IOException {
-		SqlDump sq= new SqlDump();
-		sq.readFile();
+		SqlDump sqlDump= new SqlDump();
+		sqlDump.readFile();
 
 		SpringApplication.run(DistributedDbApplication.class, args);
 	}
