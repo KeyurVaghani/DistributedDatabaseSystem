@@ -1,179 +1,211 @@
 package com.dpgten.distributeddb.userauthentication;
 
+import com.dpgten.distributeddb.utils.FileResourceUtils;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 /**
  * Authentication Login Menus
+ *
  * @author DMWA Group 10
  */
+@Data
+@Component
 public class LoginMenu {
-    private final Scanner scanner;
+
     public static String USER_NAME;
-    File file;
+
+    FileResourceUtils fileResourceUtils;
+    private Scanner scanner;
+    private String delimeter = "$\\|$";
+    @Autowired
+    private UserSession userSession;
+    private User user;
+
+    private File file;
+
+    private String userProfile = "src//main//resources//UserProfiles.txt";
 
     /**
      * Default Constructor
      */
     public LoginMenu() {
         scanner = new Scanner(System.in);
-        System.out.println("============ WELCOME ==========");
-        file = new File("UserProfiles.txt");
+        fileResourceUtils = new FileResourceUtils();
+        System.out.println("-------------------------------------------------------");
+        System.out.println("------Welcome to dpg-10 Distributed Database-----------");
+        System.out.println("-------------------------------------------------------");
+        file = new File(userProfile);
+        user = new User();
     }
 
     /**
      * Displays first selection menu.
-     * @throws IOException handles the file not found etc.
-     * @throws InterruptedException handles the interruption errors.
      */
-    void userFirstMenu() throws IOException, InterruptedException {
-        System.out.println("========== USER SELECTION =========");
-        System.out.println("1. User Login\n2. New User? Register\n3. Exit");
-        System.out.print("Enter your Choice: ");
-        String selectUser = scanner.nextLine();
-        userMainMenu(selectUser);
+    public void userFirstMenu() {
+        boolean loopCheck = true;
+        while (loopCheck) {
+//            System.out.println("1. User Login\n2. New User? Register\n3. Exit");
+            System.out.println("\nMain Menu");
+            System.out.println("Press 1 ==> User Login\nPress 2 ==> Register new user\nPress 3 ==> Exit");
+            System.out.print("Enter your Choice::: ");
+            String selectedOption = scanner.nextLine();
+            switch (selectedOption) {
+                case "1":
+                    boolean result = attemptLogin();
+                    if (!result) {
+                        System.out.println("Invalid credentials/User does not exist");
+                    } else {
+                        System.out.println("Calling query executor");
+//                        QueryImpl queryImpl = new QueryImpl();
+//                        queryImpl.executeQuery();
+                        loopCheck = false;
+                    }
+                    break;
+                case "2":
+                    registerNewUser();
+                    break;
+                case "3":
+                    loopCheck = logout();
+                    break;
+                default:
+                    System.out.println("Invalid input please try again!!");
+            }
+        }
+        //below line needs to be removed.
+        System.exit(1);
     }
 
+
     /**
-     * Displays second menu according choice
-     * @param selectUser provides user choice
-     * @throws IOException handles the file not found etc.
+     * Validates user login page
+     *
+     * @throws IOException          handles the file not found etc.
      * @throws InterruptedException handles the interruption errors.
      */
-    void userMainMenu(String selectUser) throws IOException, InterruptedException {
-        switch (selectUser) {
-            case "1":
-                System.out.print("Enter username: ");
-                USER_NAME = scanner.nextLine();
-                System.out.print("Enter password: ");
-                String userPassword = scanner.nextLine();
-//                System.out.print("Enter your security question: ");
-//                String securityQuestion = scanner.nextLine();
-                System.out.print("What's your favorite movie? \nEnter your security answer: ");
-                String securityAnswer = scanner.nextLine();
-                userLoginChecker(userPassword, securityAnswer);
-                break;
-            case "2":
-                System.out.print("Username: ");
-                USER_NAME = scanner.nextLine();
-                if (userExists()) {
-                    System.out.println("User already exist.. Login again!!\n");
-                    userFirstMenu();
-                }
-                while (userExists()) {
-                    System.out.print("Username: ");
-                    USER_NAME = scanner.nextLine();
-                    if (userExists()) {
-                        System.out.println("User already exist.. Login again!!\n");
-                        userFirstMenu();
+    private boolean attemptLogin() {
+        System.out.print("Enter username::");
+        user.setUsername(scanner.nextLine());
+        System.out.print("Enter password::");
+        user.setPassword(scanner.nextLine());
+        BufferedReader bufferedReader = null;
+        String lineSingleUser;
+        boolean loginChecker = false;
+        InputStream inputStream = fileResourceUtils.getFileFromResourceAsStream(userProfile);
+//            bufferedReader = new BufferedReader(new FileReader(file));
+
+        try (InputStreamReader streamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             BufferedReader reader = new BufferedReader(streamReader)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+//                System.out.println(line);
+                String[] lineSingleUserArray = line.split("\\|");
+                if (lineSingleUserArray.length > 4) {
+                    if (user.getUsername().equals(lineSingleUserArray[0].trim()) && user.getPassword().equals(lineSingleUserArray[1].trim())) {
+                        loginChecker = true;
+                        break;
                     }
                 }
-                System.out.print("Password: ");
-                userPassword = scanner.nextLine();
+            }
 
-                /*
-                 * TODO SHA Algorithm check
-                 */
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//            while ((lineSingleUser = bufferedReader.readLine()) != null) {
+//                String[] lineSingleUserArray = lineSingleUser.split(" \\| ");
+//                for (int i = 0; i < lineSingleUserArray.length; i++) {
+//
+//                    if (user.getUsername().equals(lineSingleUserArray[i].trim()))
+//                        if (user.getPassword().equals(lineSingleUserArray[i + 1].trim())) {
+////                            if (securityAnswer.equals(lineSingleUserArray[i + 2].trim())) {
+//                            loginChecker = true;
+////                            }
+//                        }
+//
+//                }
+//            }
+
+        return loginChecker;
+    }
+
+
+    private void registerNewUser() {
+        System.out.print("\nPreparing to register a new user\n");
+        System.out.print("Enter Username: ");
+        user.setUsername(scanner.nextLine());
+        if (userExists()) {
+            System.out.println("User already exists.. Try registering again!!\n");
+            return;
+        }
+        System.out.print("Enter Password: ");
+        user.setPassword(scanner.nextLine());
+
+        /*
+         * TODO SHA Algorithm check
+         */
 //                try {
 //                    userPassword=AlgorithmHashSHA.getSHA256Hash(userPassword);
 //                } catch (NoSuchAlgorithmException e) {
 //                    e.printStackTrace();
 //                }
-                System.out.print("What's your favorite movie? ");
-                securityAnswer = scanner.nextLine();
-                System.out.println("Registered Successfully");
-                userRegistrationAddFile(userPassword, securityAnswer);
-                userFirstMenu();
-                break;
-            case "3":
-                System.out.println("Bye");
-                System.exit(0);
-                break;
-
-            default:
-                System.out.println("Invalid input please try again!!");
-                System.exit(0);
-        }
-    }
-
-    /**
-     * Validates user login page
-     * @param userPassword passed from the userMainMenu
-     * @param securityAnswer passed from previous menu
-     * @throws IOException handles the file not found etc.
-     * @throws InterruptedException handles the interruption errors.
-     */
-    void userLoginChecker(String userPassword, String securityAnswer) throws IOException, InterruptedException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-        String lineSingleUser;
-        boolean loginChecker = false;
-
-        while ((lineSingleUser = bufferedReader.readLine()) != null) {
-            String[] lineSingleUserArray = lineSingleUser.split(" \\| ");
-            for (int i = 0; i < lineSingleUserArray.length; i++) {
-                try {
-                    if (USER_NAME.equals(lineSingleUserArray[i].trim()))
-                        if (userPassword.equals(lineSingleUserArray[i + 1].trim())) {
-                            if (securityAnswer.equals(lineSingleUserArray[i + 2].trim())) {
-                                loginChecker = true;
-                            }
-                        }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (loginChecker) {
-            System.out.println("Login Successfully");
-            afterLoginMenu();
-        } else {
-            System.out.println("\n Invalid credentials or not registered \n");
-            userFirstMenu();
-        }
+        System.out.print("Enter Security question ");
+        user.setSecurityQuestion(scanner.nextLine());
+        System.out.print("Enter Answer");
+        user.setSecurityAnswer(scanner.nextLine());
+        System.out.println("User " + user.getUsername() + " was registered Successfully.");
+        userRegistrationAddFile();
     }
 
     /**
      * Adds the user info from registration input method
-     * @param userPassword passed from user main menu
-     * @param securityAnswer passed from previous method
+     *
      * @throws IOException handles the file not found etc.
      */
-    void userRegistrationAddFile(String userPassword, String securityAnswer) throws IOException {
-        PrintWriter printWriter = new PrintWriter(new BufferedWriter(new FileWriter(file,true)));
-        printWriter.println(USER_NAME + " | " + userPassword + " | " + securityAnswer);
-        printWriter.close();
-        afterLoginMenu();
+    public boolean userRegistrationAddFile() {
+        String line = user.getUsername() + "|" + user.getPassword() + "|" + user.getSecurityQuestion() + "|" + user.getSecurityAnswer() + "|" + "N";
+        return FileResourceUtils.appendToFile(userProfile, line);
     }
 
-    Boolean userExists() throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            String[] lineSingleUser = line.split(" \\| ");
-            for (String userInfo : lineSingleUser) {
-                try {
-                    if (USER_NAME.equals(userInfo.trim())) {
-                        return true;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+    public Boolean userExists() {
+        boolean result = false;
+        BufferedReader bufferedReader = null;
+        try {
+            bufferedReader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String line = null;
+        while (!result) {
+            try {
+                if ((line = bufferedReader.readLine()) == null) break;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String[] lineSingleUser = line.split(delimeter);
+            if (lineSingleUser.length >= 4) {
+                if (user.getUsername().equals(lineSingleUser[0])) {
+                    result = true;
                 }
             }
         }
+        return result;
+    }
+
+    public boolean logout() {
+        user.setLoggedIn("N");
+        // write code to update file.
+        System.out.println("Logging out, Have a great day.");
         return false;
     }
 
     void afterLoginMenu() {
         AccessMenu.openAccessMenu();
     }
-
-    /*
-     * Check with main
-     */
-//
-//    public static void main(String[] args) throws IOException, InterruptedException {
-//        LoginMenu lm = new LoginMenu();
-//        lm.userFirstMenu();
-//    }
 }
 

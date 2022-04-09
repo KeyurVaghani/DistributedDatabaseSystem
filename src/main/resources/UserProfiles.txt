@@ -1,5 +1,2 @@
-prakrut_sir| password_guru| Prakrut Suthar | What's your favourite movie?| Pushpa | Y
-stiglitz_ | password_gandhi | Gandhi Rajan Mahendran|What's your favourite movie?| Pushpa | N
-keyur_vaghani| password_keyur |Keyur Vaghani|What's your favourite movie?| Pushpa | N
-adarsh| password_adarsh| Adarsh Kannan Iyengar|What's your favourite movie?| Pushpa | Y
-vikas_royal| password_vikas| Sai Vikas Chinthirla |What's your favourite movie?| Pushpa | N
+karthik|kanna|kanna|kanna|N
+shathish|annamalai|shatish|anomaly|N
