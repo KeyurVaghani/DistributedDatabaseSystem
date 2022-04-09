@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.security.NoSuchAlgorithmException;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
@@ -49,6 +50,8 @@ public class LoginMenu {
 
     /**
      * Displays first selection menu.
+     * @throws IOException handles the file not found etc.
+     * @throws InterruptedException handles the interruption errors.
      */
     public void userFirstMenu() {
         boolean loopCheck = true;
