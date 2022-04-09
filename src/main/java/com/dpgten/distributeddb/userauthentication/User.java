@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 public class User {
     private String username;
 
-    private String password;
+    private String hashedUsername;
+
+    private String hashedPassword;
 
     private String securityQuestion;
 
