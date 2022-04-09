@@ -10,8 +10,7 @@ import java.util.Date;
 import java.util.Map;
 
 public class EventLogs {
-private final String EVENT_LOG_FILE_LOCATION = "src/main/resources/log\n" +
-            "    s/EventLogs.txt";
+private final String EVENT_LOG_FILE_LOCATION = "src\\main\\resources\\logs\\EventLogs.txt";
 
     private static EventLogs eventLogsInstance = null;
 

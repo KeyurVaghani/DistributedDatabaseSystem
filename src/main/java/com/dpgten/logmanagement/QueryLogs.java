@@ -6,12 +6,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.Map;
 
 public class QueryLogs {
 
-    private final String QUERY_LOG_FILE_LOCATION = "src/main/resources/logs/QueryLogs.txt";
+    private final String QUERY_LOG_FILE_LOCATION = "src\\main\\resources\\logs\\QueryLogs.txt";
 
     private static QueryLogs queryLogsInstance = null;
 
