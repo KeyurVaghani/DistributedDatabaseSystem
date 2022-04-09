@@ -8,7 +8,7 @@ public class QueryImpl {
     public void executeQuery() {
         System.out.println(YELLOW+"-----------------------INSTANCE STARTED---------------------"+RESET);
         System.out.println(BLUE+"AUTHENTICATION HAS BEEN SUCCESSFULLY"+RESET);
-        String currentUser = "user_0";
+//        String currentUser = "user_0";
         String currentDatabase = "";
 
         Scanner input = new Scanner(System.in);
@@ -30,8 +30,10 @@ public class QueryImpl {
             }else if(!currentDatabase.equals("") && validator.isInsertQuery(inputQuery)){
                 TableQuery tableQuery = new TableQuery();
                 tableQuery.insertRow(inputQuery);
-            }
-            else {
+            }else if(!currentDatabase.equals("") && validator.isUpdateQuery(inputQuery)){
+                TableQuery tableQuery = new TableQuery();
+                tableQuery.updateRow(inputQuery);
+            }else{
                 System.out.println(RED+"PLEASE ENTER VALID QUERY"+RESET);
             }
             System.out.println("please type "+RED+"y"+RESET +" to continue");
