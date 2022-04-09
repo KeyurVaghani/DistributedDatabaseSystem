@@ -13,24 +13,23 @@ public class QueryImpl {
 
         Scanner input = new Scanner(System.in);
         String inputQuery = "y";
-        DatabaseQuery dbQuery = new DatabaseQuery(SERVER_1, SERVER_2, currentUser);
+        DatabaseQuery dbQuery = new DatabaseQuery();
         while (inputQuery.toLowerCase(Locale.ROOT).equals("y")) {
+            QueryValidator validator = new QueryValidator();
                 inputQuery = input.nextLine();
-            if (dbQuery.isUseQuery(inputQuery)) {
+            if (validator.isUseQuery(inputQuery)) {
                 currentDatabase = dbQuery.selectDatabase(inputQuery);
-            } else if (!currentDatabase.equals("") && dbQuery.isCreateTableQuery(inputQuery)) {
-                String database1 = dbQuery.getDatabase1Path();
-                String database2 = dbQuery.getDatabase2Path();
-                TableQuery tableQuery = new TableQuery(database1, database2);
-                tableQuery.createTable(inputQuery);
-            } else if (!currentDatabase.equals("") && dbQuery.isCreateQuery(inputQuery)) {
+            } else if (!currentDatabase.equals("") && validator.isCreateTableQuery(inputQuery)) {
+                TableQuery tableQuery = new TableQuery();
+                tableQuery.createTable(inputQuery,currentDatabase);
+            } else if (!currentDatabase.equals("") && validator.isCreateQuery(inputQuery)) {
                 dbQuery.createDatabase(inputQuery);
-            }else if(!currentDatabase.equals("") && dbQuery.isSelectQuery(inputQuery)){
-                dbQuery.selectRows(inputQuery);
-            }else if(!currentDatabase.equals("") && dbQuery.isInsertQuery(inputQuery)){
-                dbQuery.insertRow(inputQuery);
-            }else if(dbQuery.isWhereCondition(inputQuery)){
-
+            }else if(!currentDatabase.equals("") && validator.isSelectQuery(inputQuery)){
+                TableQuery tblQuery = new TableQuery();
+                tblQuery.selectRows(inputQuery);
+            }else if(!currentDatabase.equals("") && validator.isInsertQuery(inputQuery)){
+                TableQuery tableQuery = new TableQuery();
+                tableQuery.insertRow(inputQuery);
             }
             else {
                 System.out.println(RED+"PLEASE ENTER VALID QUERY"+RESET);

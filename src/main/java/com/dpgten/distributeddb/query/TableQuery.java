@@ -1,22 +1,61 @@
 package com.dpgten.distributeddb.query;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
+import com.dpgten.distributeddb.utils.MetadataUtils;
+
+import java.io.*;
+import java.util.*;
 import java.util.regex.Matcher;
 
+import static com.dpgten.distributeddb.query.QueryParser.INSERT_TABLE_PATTERN;
+import static com.dpgten.distributeddb.query.QueryParser.SELECT_TABLE_PATTERN;
 import static com.dpgten.distributeddb.utils.Utils.*;
 
 public class TableQuery {
-    String database1;
-    String database2;
 
-    public TableQuery(String database1Path,String database2Path){
-        this.database1 = database1Path;
-        this.database2 = database2Path;
+    public void selectRows(String inputQuery){
+        Matcher selectRowsMatcher = SELECT_TABLE_PATTERN.matcher(inputQuery);
+        String tableName = "";
+        String tablePath = "";
+
+        if(selectRowsMatcher.find()){
+            MetadataUtils mdUtils = new MetadataUtils();
+            tableName = selectRowsMatcher.group(8);
+            tablePath = mdUtils.getTablePath(tableName);
+        }
+        File tableFile = new File(tablePath);
+
+        if(!selectRowsMatcher.group(9).isEmpty()){
+            String columnName = selectRowsMatcher.group(10);
+            String columnValue = selectRowsMatcher.group(11);
+            List<String> selectRows = executeWhere(tableFile,columnName,columnValue);
+            selectRows.forEach(System.out::println);
+        }
+    }
+
+    public List<String> executeWhere(File tableFile, String columnName
+            , String columnValue){
+        List<String> selectRows = new ArrayList<>();
+        try {
+            Scanner tableScanner = new Scanner(tableFile);
+            tableScanner.nextLine();
+            String columnHeader = tableScanner.nextLine();
+            String[] headers = columnHeader.split("\\|");
+            List<String> headerArray = new ArrayList<>();
+            for(String header: headers){
+                headerArray.add(header.split(",")[0]);
+            }
+            int columnIndex = headerArray.indexOf(columnName);
+
+            while(tableScanner.hasNext()){
+                String row = tableScanner.nextLine();
+                if(row.split(",")[columnIndex].equals(columnValue)){
+                    selectRows.add(row);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return selectRows;
     }
 
     public boolean searchTable(String tableName,String database){
@@ -32,11 +71,7 @@ public class TableQuery {
         return false;
     }
 
-    public boolean isExistTable(String tableName){
-        return searchTable(tableName, database1) || searchTable(tableName, database2);
-    }
-
-    public void createTable(String inputQuery){
+    public void createTable(String inputQuery,String databaseName){
         Matcher createTableMatcher = QueryParser.CREATE_TABLE_PATTERN.matcher(inputQuery);
         String tableName = null;
         String tableColumn = null;
@@ -72,8 +107,10 @@ public class TableQuery {
             }
         }
 
+        MetadataUtils mdUtils = new MetadataUtils();
         //todo try to put tables into the either server based on some requirements
-        File table = new File(this.database1+'/'+tableName+".txt");
+
+        File table = new File(SCHEMA+"/"+databaseName+"/"+tableName+".txt");
 
         if(!table.exists()){
             try {
@@ -101,6 +138,61 @@ public class TableQuery {
         } catch (IOException e) {
             System.out.println("ERROR IN INSERTING THE COLUMNS");
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void insertRow(String inputQuery){
+        List<String[]> line=new ArrayList<>();
+        Matcher queryMatcher = INSERT_TABLE_PATTERN.matcher(inputQuery);
+        MetadataUtils mdUtils = new MetadataUtils();
+        String tablePath = "";
+
+        if(queryMatcher.find()){
+            String tableName = queryMatcher.group(1);
+            tablePath = mdUtils.getTablePath(tableName);
+        }
+        try(BufferedReader br=new BufferedReader(new FileReader(tablePath))){
+            br.readLine();
+            String columnNamesLine=br.readLine();
+            List<String> columns = Arrays.asList(columnNamesLine.split(PRIMARY_DELIMITER_REGEX));
+            List<String> columnNames = new ArrayList<>();
+
+            for(String column:columns){
+                columnNames.add(column.split(",")[0]);
+            }
+
+            int i=0;
+            boolean increase=false;
+                increase=true;
+                List<String> currentCol=Arrays.asList(queryMatcher.group(2).split(","));
+                String[] currentVal=queryMatcher.group(3).split(",");
+                line.add(new String[currentVal.length]);
+                int vIndex=0;
+                for(String col:currentCol) {
+                    int index=columnNames.indexOf(col.trim());
+                    if(index!=-1) {
+                        line.get(i)[index]= currentVal[vIndex++];
+                    }else {
+                        System.out.println("Column Name Mismatch.");
+                        line.remove(line.size()-1);
+                        increase = false;
+                        break;
+                    }
+                }
+            if(increase) {
+                i++;
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        try(BufferedWriter bw=new BufferedWriter(new FileWriter(tablePath,true))){
+            for(String[] list:line) {
+                List<String> alist=Arrays.asList(list);
+               bw.append("\n");
+                bw.append(alist.toString().substring(1,alist.toString().length()-1).replace(",",PRIMARY_DELIMITER));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

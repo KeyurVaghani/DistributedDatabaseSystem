@@ -1,2 +1,0 @@
-PK|ssss
-ss,int|s,int|ssss,varchar
