@@ -23,11 +23,16 @@ public class QueryImpl {
                 String database2 = dbQuery.getDatabase2Path();
                 TableQuery tableQuery = new TableQuery(database1, database2);
                 tableQuery.createTable(inputQuery);
-            } else if (dbQuery.isCreateQuery(inputQuery)) {
+            } else if (!currentDatabase.equals("") && dbQuery.isCreateQuery(inputQuery)) {
                 dbQuery.createDatabase(inputQuery);
-            }else if(dbQuery.isSelectQuery(inputQuery)){
+            }else if(!currentDatabase.equals("") && dbQuery.isSelectQuery(inputQuery)){
                 dbQuery.selectRows(inputQuery);
-            }else {
+            }else if(!currentDatabase.equals("") && dbQuery.isInsertQuery(inputQuery)){
+                dbQuery.insertRow(inputQuery);
+            }else if(dbQuery.isWhereCondition(inputQuery)){
+
+            }
+            else {
                 System.out.println(RED+"PLEASE ENTER VALID QUERY"+RESET);
             }
             System.out.println("please type "+RED+"y"+RESET +" to continue");
