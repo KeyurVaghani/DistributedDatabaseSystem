@@ -1,5 +1,7 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.utils.FileResourceUtils;
+import com.dpgten.distributeddb.access.RestCallController;
 import com.dpgten.distributeddb.utils.MetadataUtils;
 
 import java.io.*;
@@ -12,22 +14,31 @@ import static com.dpgten.distributeddb.utils.Utils.*;
 
 public class TableQuery {
 
-    public void selectRows(String inputQuery){
-        Matcher selectRowsMatcher = SELECT_TABLE_PATTERN.matcher(inputQuery);
-        String tablePath = "";
+    RestCallController restCallController= new RestCallController();
 
+    public List<String> selectRows(String inputQuery){
+        Matcher selectRowsMatcher = SELECT_TABLE_WHERE_PATTERN.matcher(inputQuery);
+        String tablePath = "";
+        List<String> selectRows = new ArrayList<>();
         if(selectRowsMatcher.find()){
             MetadataUtils mdUtils = new MetadataUtils();
             tablePath = mdUtils.getTablePath(selectRowsMatcher.group(8));
+            String instance = mdUtils.getVMInstance(selectRowsMatcher.group(8));
+            String [] result= restCallController.selectRestCall(inputQuery, instance);
         }
+
         File tableFile = new File(tablePath);
 
         if(selectRowsMatcher.group(9) != null){
             String columnName = selectRowsMatcher.group(10);
             String columnValue = selectRowsMatcher.group(11);
-            List<String> selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
+            selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
             selectRows.forEach(System.out::println);
+        }else{
+            FileResourceUtils fileUtils = new FileResourceUtils();
+            fileUtils.printFile(tableFile);
         }
+        return selectRows;
     }
 
     public void updateRow(String inputQuery){
@@ -43,7 +54,23 @@ public class TableQuery {
             String columnName = updateQueryMatcher.group(5);
             String columnValue = updateQueryMatcher.group(6);
             List<String> selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
-            selectRows.forEach(System.out::println);
+            StringBuilder updatedFile = new StringBuilder();
+            try {
+                Scanner tableScanner = new Scanner(tableFile);
+                updatedFile.append(tableScanner.nextLine()).append("\n").append(tableScanner.nextLine());
+                tableScanner.close();
+                updatedFile.append("\n").append(selectRows.stream().map(Object::toString)
+                        .collect(Collectors.joining("\n")));
+                try {
+                    FileWriter tableWriter = new FileWriter(tableFile);
+                    tableWriter.write(updatedFile.toString());
+                    tableWriter.close();
+                } catch (IOException e) {
+                    System.out.println(e.getMessage());
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -60,12 +87,15 @@ public class TableQuery {
         try {
             Scanner tableScanner = new Scanner(tableFile);
             tableScanner.nextLine();
+            tableScanner.nextLine();
             String columnHeader = tableScanner.nextLine();
             String[] headers = columnHeader.split(PRIMARY_DELIMITER_REGEX);
             List<String> headerArray = new ArrayList<>();
             for(String header: headers){
                 headerArray.add(header.split(",")[0]);
             }
+
+            //todo fix ArrayIndexOutOFBound Error = -1
             int columnIndex = headerArray.indexOf(columnName);
 
             while(tableScanner.hasNext()){
@@ -76,17 +106,15 @@ public class TableQuery {
                     }else if(operation.equals("update")){
                         Matcher updateQueryMatcher = UPDATE_TABLE_PATTERN.matcher(inputQuery);
                         if(updateQueryMatcher.find()){
-                            String matchColumnName = updateQueryMatcher.group(2);
                             String matchColumnValue = updateQueryMatcher.group(3);
-                            int matchColumnIndex = headerArray.indexOf(matchColumnName);
                             String[] rowValues = row.split(PRIMARY_DELIMITER_REGEX);
-                            rowValues[matchColumnIndex] = matchColumnValue;
+                            rowValues[columnIndex] = matchColumnValue;
                             selectRows.add(String.join(PRIMARY_DELIMITER,rowValues));
                         }
-                    }else{
-                        if(operation.equals("update") || operation.equals("delete")){
-                            selectRows.add(row);
-                        }
+                    }
+                }else{
+                    if(operation.equals("update") || operation.equals("delete")){
+                        selectRows.add(row);
                     }
                 }
             }

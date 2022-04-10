@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.access.RestCallController;
 import com.dpgten.distributeddb.userauthentication.User;
 
 import java.util.Locale;
@@ -25,9 +26,19 @@ public class QueryImpl {
             inputQuery = input.nextLine();
             if (validator.isUseQuery(inputQuery)) {
                 currentDatabase = dbQuery.selectDatabase(inputQuery);
-                System.out.println(YELLOW + "Database selected. Current Database is " + BLUE + currentDatabase + YELLOW + "." + RESET);
+                if(currentDatabase.isEmpty()){
+                    System.out.println(RED + "DATABASE NOT FOUND" + RESET);
+                }else {
+                    System.out.println(YELLOW + "Database selected. Current Database is "
+                            + BLUE + currentDatabase + YELLOW + "." + RESET);
+                }
             } else if (currentDatabase.isEmpty()) {
-                System.out.println(RED + "No Database selected, please select database!" + RESET);
+                if(validator.isCreateQuery(inputQuery)){
+                    dbQuery.createDatabase(inputQuery);
+                }
+                else {
+                    System.out.println(RED + "No Database selected, please select database!" + RESET);
+                }
             } else if (validator.isCreateTableQuery(inputQuery)) {
                 TableQuery tableQuery = new TableQuery();
                 tableQuery.createTable(inputQuery, currentDatabase);
@@ -39,7 +50,11 @@ public class QueryImpl {
             } else if (validator.isInsertQuery(inputQuery)) {
                 TableQuery tableQuery = new TableQuery();
                 tableQuery.insertRow(inputQuery);
-            } else if (dbQuery.isDeleteQuery(inputQuery)) {
+            }else if(validator.isUpdateQuery(inputQuery)){
+                TableQuery tableQuery = new TableQuery();
+                tableQuery.updateRow(inputQuery);
+            }
+            else if (dbQuery.isDeleteQuery(inputQuery)) {
                 DeleteQueryParser deleteQueryParser = new DeleteQueryParser();
                 deleteQueryParser.executeDeleteQueryWithConditionQuery(inputQuery, user);
             } else {

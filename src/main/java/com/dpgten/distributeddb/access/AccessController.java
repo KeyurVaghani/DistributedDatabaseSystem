@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.access;
 
+import com.dpgten.distributeddb.query.TableQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +20,7 @@ import static com.dpgten.distributeddb.utils.Utils.GLOBAL_METADATA;
 public class AccessController {
 
 
-    @Autowired
-    RestTemplate restTemplate;
+
     private String baseURL;
 
     private Integer instanceType;
@@ -57,5 +57,14 @@ public class AccessController {
             e.printStackTrace();
         }
         return result;
+    }
+
+    @GetMapping("/query/get")
+    public String[] greeting(@RequestParam String query) {
+        List <String> result = new ArrayList<>();
+        TableQuery tableQuery = new TableQuery();
+        result = tableQuery.selectRows(query);
+        String[] stringArray = result.toArray(new String[0]);
+        return stringArray;
     }
 }
