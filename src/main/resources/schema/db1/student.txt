@@ -1,4 +1,5 @@
 primary_key|sid
+foreign_key|name
 Column|sid,varchar|name,varchar|mark1,int
 Row|1|gandhi|80
 Row|2|keyur|100
