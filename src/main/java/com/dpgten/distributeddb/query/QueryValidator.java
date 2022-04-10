@@ -17,7 +17,7 @@ public class QueryValidator {
     }
 
     public boolean isSelectQuery(String inputQuery){
-        return SELECT_TABLE_PATTERN.matcher(inputQuery).find();
+        return SELECT_TABLE_WHERE_PATTERN.matcher(inputQuery).find();
     }
 
     public boolean isInsertQuery(String inputQuery){

@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.utils.FileResourceUtils;
 import com.dpgten.distributeddb.utils.MetadataUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,6 +20,20 @@ import static com.dpgten.distributeddb.utils.Utils.*;
 public class DatabaseQuery {
     String databasePath;
     String databaseName;
+    String currentUser;
+    File server1;
+    File server2;
+    String database1Path;
+    String database2Path;
+
+    FileResourceUtils fileResourceUtils = new FileResourceUtils();
+    MetadataUtils metadataUtils = new MetadataUtils();
+
+    public DatabaseQuery(String server1, String server2, String currentUser) {
+        this.server1 = new File(server1);
+        this.server2 = new File(server2);
+        this.currentUser = currentUser;
+    }
 
     public void createDatabase(String inputQuery) {
         Matcher createQueryMatcher = CREATE_DATABASE_PATTERN.matcher(inputQuery);
@@ -32,6 +47,8 @@ public class DatabaseQuery {
             MetadataUtils mdUtils = new MetadataUtils();
             if (!mdUtils.isDatabaseExist(databaseName)) {
                 database.mkdir();
+//                fileResourceUtils.appendToFile(database, "VM1|")
+                System.out.println("database " + databaseName + " Created.");
             } else {
                 System.out.println("database " + databaseName + " already exists");
             }
@@ -45,19 +62,26 @@ public class DatabaseQuery {
 
     public String selectDatabase(String selectDb) {
         Matcher useQueryMatcher = USE_DATABASE_PATTERN.matcher(selectDb);
-        String databaseName;
+        String databaseName = "";
 
         if (useQueryMatcher.find()) {
             databaseName = useQueryMatcher.group(1);
             if (Arrays.stream(KEYWORDS).allMatch(databaseName.toLowerCase(Locale.ROOT)::equals)) {
                 System.out.println(RED + "CANNOT USE PREDEFINED KEYWORDS" + RESET);
-                return "";
             }
         } else {
-            return "";
+            System.out.println(RED + "DATABASE NOT FOUND" + RESET);
         }
+//
+//        String currentUserPath1 = searchUser(server1,currentUser);
+//        String currentUserPath2 = searchUser(server2,currentUser);
+
+//        if(!currentUserPath1.equals("")){
         this.databasePath = searchDatabase(SCHEMA, databaseName);
-        if (databasePath.equals("")) {
+//        this.databasePath = searchDatabase(SCHEMA, databaseName);
+        boolean exists = metadataUtils.isDatabaseExist(databaseName);
+        if (!exists) {
+            System.out.println("Database does not exists");
             return "";
         }
         return databaseName;

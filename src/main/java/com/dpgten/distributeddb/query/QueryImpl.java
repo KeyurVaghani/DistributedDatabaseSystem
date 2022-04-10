@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.access.RestCallController;
 import com.dpgten.distributeddb.userauthentication.User;
 
 import java.util.Locale;
@@ -34,7 +35,12 @@ public class QueryImpl {
                             + BLUE + currentDatabase + YELLOW + "." + RESET);
                 }
             } else if (currentDatabase.isEmpty()) {
-                System.out.println(RED + "No Database selected, please select database!" + RESET);
+                if(validator.isCreateQuery(inputQuery)){
+                    dbQuery.createDatabase(inputQuery);
+                }
+                else {
+                    System.out.println(RED + "No Database selected, please select database!" + RESET);
+                }
             } else if (validator.isCreateTableQuery(inputQuery)) {
                 TableQuery tableQuery = new TableQuery();
                 Matcher matcher = CREATE_TABLE_PATTERN.matcher(inputQuery);
