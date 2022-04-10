@@ -20,6 +20,8 @@ public class TableQuery {
         if(selectRowsMatcher.find()){
             MetadataUtils mdUtils = new MetadataUtils();
             tablePath = mdUtils.getTablePath(selectRowsMatcher.group(8));
+            String instance = mdUtils.getVMInstance(selectRowsMatcher.group(8));
+            String [] result= restCallController.selectRestCall(inputQuery, instance);
         }
         File tableFile = new File(tablePath);
 

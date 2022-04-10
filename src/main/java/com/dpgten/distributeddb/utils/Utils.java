@@ -5,13 +5,16 @@ public class Utils {
     public static final String SERVER_1 = SERVERS + "/server1";
     public static final String SERVER_2 = SERVERS + "/server2";
 
-    public static final String LOCAL_STORAGE_PATH = "src//main//resources//schema";
+    public static final String VM_1 = "35.239.173.17";
+    public static final String VM_2 = "35.226.40.140";
+
+    public static final String LOCAL_STORAGE_PATH = "src/main/resources/schema";
     public static final String SCHEMA= "src/main/resources/schema";
 
     public static final String SERVER1_NAME = "server1";
     public static final String SERVER2_NAME = "server2";
 
-    public static final String GLOBAL_METADATA = "src//main//resources//GlobalMetaData.txt";
+    public static final String GLOBAL_METADATA = "src/main/resources/GlobalMetaData.txt";
 
     public static final String PRIMARY_DELIMITER = "|";
     public static final String PRIMARY_DELIMITER_REGEX = "\\|";
