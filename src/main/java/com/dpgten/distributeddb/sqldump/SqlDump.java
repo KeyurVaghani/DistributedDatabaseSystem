@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.dpgten.distributeddb.utils.Utils.YELLOW;
+
 public class SqlDump {
 
     //    private final String schema = "schema";
@@ -22,7 +24,7 @@ public class SqlDump {
     private final String SEMI_COLON = ";";
 
     //RENAME VARIABLES
-    public void readFile(String selectedDatabase) throws IOException {
+    public void generateDump(String selectedDatabase) {
         File dataBase = new File(schema + selectedDatabase);
         File[] tables = dataBase.listFiles();
         StringBuilder builder = new StringBuilder();
@@ -33,7 +35,11 @@ public class SqlDump {
         List<String> columnList = null;
         String tableName = null;
         for (File table: tables) {
-            currentDataMap = getDataForCurrentTable(table, currentDataMap);
+            try {
+                currentDataMap = getDataForCurrentTable(table, currentDataMap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             tableName = table.getName().replaceAll(".txt", "");
             StringBuffer createTableQuery = new StringBuffer();
             createTableQuery.append("CREATE TABLE ").append(tableName).append("(");
@@ -79,7 +85,11 @@ public class SqlDump {
                 }
             }
         }
-        writeDumpDataToFile(dumpQueries, selectedDatabase);
+        try {
+            writeDumpDataToFile(dumpQueries, selectedDatabase);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         System.out.println(builder);
     }
 
@@ -97,6 +107,7 @@ public class SqlDump {
             bufferedWriter.append(query + newline);
         }
         bufferedWriter.flush();
+        System.out.println(YELLOW+"SQL Dump Generated::File Available in resources");
     }
 
     private Map<Integer, String> getDataForCurrentTable(File table, Map<Integer, String> currentDataMap) throws IOException {

@@ -1,15 +1,11 @@
 package com.dpgten.distributeddb.erd;
 
-import ch.qos.logback.classic.db.names.ColumnName;
-import io.swagger.v3.oas.models.links.Link;
-
 import java.io.*;
-import java.lang.reflect.Array;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
+
+import static com.dpgten.distributeddb.utils.Utils.RESET;
+import static com.dpgten.distributeddb.utils.Utils.YELLOW;
 
 public class ErdGenerator {
     private final String schema = "src\\main\\resources\\schema\\";
@@ -22,30 +18,40 @@ public class ErdGenerator {
     public Scanner scanner;
 
 
-    public void generateRequiredERD() throws IOException {
+    public void generateRequiredERD() {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter a existing database name : ");
+        System.out.print(YELLOW + "Enter a existing database name:: " + RESET);
         String selectedDatabase = sc.nextLine();
         File file = new File(schema + "\\" + selectedDatabase);
         StringBuffer finalStringBuffer = new StringBuffer();
         if (file.exists()) {
             File[] tableList = file.listFiles();
             if (tableList.length != 0) {
-                for (File table: tableList) {
+                for (File table : tableList) {
                     StringBuffer stringBuffer = new StringBuffer();
-                    BufferedReader reader = new BufferedReader(new FileReader(table));
+                    BufferedReader reader = null;
+                    try {
+                        reader = new BufferedReader(new FileReader(table));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                     String tableName = table.getName().replace(".txt", "");
                     stringBuffer.append("TABLE NAME : ").append(tableName).append(NEW_LINE);
-                    String line;
+                    String line = "";
                     List<String> columnList = null;
                     String[] columnArray = null;
-                    while ((line = reader.readLine()) != null) {
+                    while (true) {
+                        try {
+                            if (!((line = reader.readLine()) != null)) break;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         if (line.startsWith("Column")) {
                             columnArray = line.split(Pattern.quote("|"));
                         }
                     }
                     String[] dataType = new String[columnArray.length];
-                    for (int i=0; i < dataType.length; i++) {
+                    for (int i = 0; i < dataType.length; i++) {
                         dataType[i] = (String.format("%s", columnArray[i]));
                     }
                     String columns = String.join(", ", Arrays.copyOfRange(dataType, 1, dataType.length));
@@ -53,23 +59,33 @@ public class ErdGenerator {
                     finalStringBuffer.append(stringBuffer.toString()).append(NEW_LINE);
                 }
                 finalStringBuffer.append("RelationShip between tables : ").append(NEW_LINE);
-                for (File table: tableList) {
+                for (File table : tableList) {
                     StringBuffer realtionBuffer = new StringBuffer();
-                    BufferedReader reader = new BufferedReader(new FileReader(table));
-                    String line;
+                    BufferedReader reader = null;
+                    try {
+                        reader = new BufferedReader(new FileReader(table));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    String line = null;
                     String[] foreignKey = null;
                     List<String> foreignKeyList = new ArrayList<>();
-                    while ((line = reader.readLine()) != null) {
+                    while (true) {
+                        try {
+                            if (!((line = reader.readLine()) != null)) break;
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         if (line.startsWith("foreign_key")) {
                             foreignKey = line.split(Pattern.quote("|"));
                             List<String> relation = new LinkedList<>(Arrays.asList(foreignKey));
                             relation.remove(0);
                             List<String> finalRealtion = null;
-                            for (String s: relation) {
+                            for (String s : relation) {
                                 String[] arr = s.split(",");
                                 finalRealtion = new LinkedList<>(Arrays.asList(arr));
                             }
-                            for (String relTale: finalRealtion) {
+                            for (String relTale : finalRealtion) {
                                 String fkTable = relTale.split(Pattern.quote("->"))[0].split(Pattern.quote("$$"))[1];
                                 foreignKeyList.add(fkTable);
                             }
@@ -80,14 +96,18 @@ public class ErdGenerator {
                         realtionBuffer.append(table.getName().replace(".txt", ""));
                         realtionBuffer.append(foreignKeyList.get(0));
                         realtionBuffer.append(" one to many relationship -  ").append(",");
-                        for (int i=0; i<foreignKeyList.size(); i++) {
+                        for (int i = 0; i < foreignKeyList.size(); i++) {
                             realtionBuffer.append(foreignKeyList.get(i)).append(",");
 
                         }
                         finalStringBuffer.append(realtionBuffer).append(NEW_LINE);
                     }
                 }
-                writeToFile(finalStringBuffer, selectedDatabase);
+                try {
+                    writeToFile(finalStringBuffer, selectedDatabase);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             System.out.println("Please Create The Database First As The Database Does Not Exist");
@@ -107,40 +127,4 @@ public class ErdGenerator {
         bufferedWriter.flush();
 
     }
-
-    public File getFileResource(String fileName) {
-
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resource = classLoader.getResource(fileName);
-        if (resource == null) {
-            throw new IllegalArgumentException("File not found!" + fileName);
-        } else {
-            try {
-                return new File(resource.toURI());
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-
-    public InputStream getFileFromResourceAsStream(String fileName) {
-        // The class loader that loaded the class
-        ClassLoader classLoader = getClass().getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(fileName);
-        // the stream holding the file content
-        if (inputStream == null) {
-            throw new IllegalArgumentException("file not found! " + fileName);
-        } else {
-            return inputStream;
-        }
-
-    }
-
-    public static void main(String[] args) throws IOException {
-        ErdGenerator erd= new ErdGenerator();
-        erd.generateRequiredERD();
-    }
-
 }

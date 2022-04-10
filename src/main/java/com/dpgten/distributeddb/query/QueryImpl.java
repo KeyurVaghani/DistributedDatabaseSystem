@@ -12,8 +12,7 @@ import static com.dpgten.distributeddb.query.QueryParser.*;
 
 public class QueryImpl {
     public boolean executeQuery(User user) {
-        System.out.println("\n" + YELLOW + "-----------------------Welcome " + user.getUsername() + "---------------------" + RESET);
-        System.out.println(BLUE + "AUTHENTICATION SUCCESS" + RESET);
+
 //        String currentUser = user.getUsername();
         String currentDatabase = "";
 
