@@ -24,7 +24,7 @@ public class TableQuery {
             MetadataUtils mdUtils = new MetadataUtils();
             tablePath = mdUtils.getTablePath(selectRowsMatcher.group(8));
             String instance = mdUtils.getVMInstance(selectRowsMatcher.group(8));
-            String [] result= restCallController.selectRestCall(inputQuery, instance);
+//            String [] result= restCallController.selectRestCall(inputQuery, instance);
         }
 
         File tableFile = new File(tablePath);
@@ -57,7 +57,8 @@ public class TableQuery {
             StringBuilder updatedFile = new StringBuilder();
             try {
                 Scanner tableScanner = new Scanner(tableFile);
-                updatedFile.append(tableScanner.nextLine()).append("\n").append(tableScanner.nextLine());
+                updatedFile.append(tableScanner.nextLine()).append("\n")
+                        .append(tableScanner.nextLine()).append("\n").append(tableScanner.nextLine());
                 tableScanner.close();
                 updatedFile.append("\n").append(selectRows.stream().map(Object::toString)
                         .collect(Collectors.joining("\n")));
@@ -106,9 +107,11 @@ public class TableQuery {
                     }else if(operation.equals("update")){
                         Matcher updateQueryMatcher = UPDATE_TABLE_PATTERN.matcher(inputQuery);
                         if(updateQueryMatcher.find()){
+                            String matchColumnName = updateQueryMatcher.group(2);
+                            int matchColumnIndex = headerArray.indexOf(matchColumnName);
                             String matchColumnValue = updateQueryMatcher.group(3);
                             String[] rowValues = row.split(PRIMARY_DELIMITER_REGEX);
-                            rowValues[columnIndex] = matchColumnValue;
+                            rowValues[matchColumnIndex] = matchColumnValue;
                             selectRows.add(String.join(PRIMARY_DELIMITER,rowValues));
                         }
                     }
@@ -159,10 +162,10 @@ public class TableQuery {
                 String columnName = column.split("\\s+")[0];
                 String columnType = column.split("\\s+")[1];
 
-                if(!isPrimaryKey && column.contains("PRIMARY KEY") ){
+                if(!isPrimaryKey && column.contains("primary_key") ){
                     isPrimaryKey = true;
                     primaryKeyTable = columnName;
-                }else if(isPrimaryKey && column.contains("PRIMARY KEY")){
+                }else if(isPrimaryKey && column.contains("primary_key")){
                     System.out.println(RED+"MULTIPLE PRIMARY KEY");
                 }
 
@@ -191,14 +194,19 @@ public class TableQuery {
             FileWriter writeHeader = new FileWriter(table);
             StringBuilder columnWriterString = new StringBuilder("");
 
-            columnWriterString.append("PK").append(PRIMARY_DELIMITER).append(primaryKeyTable).append("\n");
+            columnWriterString.append("primary_key").append(PRIMARY_DELIMITER).append(primaryKeyTable).append("\n")
+                    .append("foreign_key|name").append("\n");
+
             for (String columnName: tableColumnList.keySet()) {
-                columnWriterString.append(columnName).append(SECONDARY_DELIMITER)
+                columnWriterString.append("Column|").append(columnName).append(SECONDARY_DELIMITER)
                         .append(tableColumnList.get(columnName)).append(PRIMARY_DELIMITER);
             }
 
             writeHeader.write(String.valueOf(columnWriterString.deleteCharAt(columnWriterString.length()-1)));
             writeHeader.close();
+
+            MetadataUtils mdUtils = new MetadataUtils();
+            mdUtils.createTableEntry(tableName,databaseName);
         } catch (IOException e) {
             System.out.println("ERROR IN INSERTING THE COLUMNS");
             System.out.println(e.getMessage());
@@ -217,6 +225,7 @@ public class TableQuery {
         }
         try(BufferedReader br=new BufferedReader(new FileReader(tablePath))){
             br.readLine();
+            br.readLine();
             String columnNamesLine=br.readLine();
             List<String> columns = Arrays.asList(columnNamesLine.split(PRIMARY_DELIMITER_REGEX));
             List<String> columnNames = new ArrayList<>();
@@ -230,7 +239,9 @@ public class TableQuery {
                 increase=true;
                 List<String> currentCol=Arrays.asList(queryMatcher.group(2).split(","));
                 String[] currentVal=queryMatcher.group(3).split(",");
-                line.add(new String[currentVal.length]);
+                String[] values = new String[currentVal.length + 1];
+                values[0] = "Row";
+                line.add(values);
                 int vIndex=0;
                 for(String col:currentCol) {
                     int index=columnNames.indexOf(col.trim());

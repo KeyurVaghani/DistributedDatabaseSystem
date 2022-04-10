@@ -1,7 +1,13 @@
 package com.dpgten.distributeddb.utils;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +15,9 @@ import java.util.Scanner;
 
 import static com.dpgten.distributeddb.utils.Utils.*;
 
+@Configuration @PropertySource("classpath:application.properties")
 public class MetadataUtils {
+    @Value("${api.host.baseurl.instanceOne}") String baseURLOne;
 
     public String[] listDatabases(String serverName){
         File globalMetaData = new File(GLOBAL_METADATA);
@@ -75,6 +83,20 @@ public class MetadataUtils {
             System.out.println(e.getMessage());
         }
         return "";
+    }
+
+    public boolean createTableEntry(String tableName,String databaseName){
+        String entry = "\n"+baseURLOne+PRIMARY_DELIMITER+databaseName+PRIMARY_DELIMITER+tableName;
+        File metadata = new File(GLOBAL_METADATA);
+        try {
+            FileWriter writer = new FileWriter(metadata,true);
+            writer.write(entry);
+            writer.close();
+            return true;
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        return false;
     }
 
 //    public String findTableInServer(String tableName){
