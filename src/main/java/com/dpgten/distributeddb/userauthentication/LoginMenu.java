@@ -70,6 +70,8 @@ public class LoginMenu {
                     } else {
                         System.out.println("Calling query executor");
                         QueryImpl queryImpl = new QueryImpl();
+                        MainMenu menu = new MainMenu();
+                        loopCheck = menu.drive(user);
                         loopCheck = queryImpl.executeQuery(user);
 //                        loopCheck = false;
                     }
