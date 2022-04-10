@@ -24,8 +24,7 @@ public class ErdGenerator {
         File obj = getFileResource(schema);
         scanner = new Scanner(System.in);
         System.out.println("Please select database: ");
-//        String requiredDatabase = scanner.next();
-        String requiredDatabase="db1";
+        String requiredDatabase = scanner.next();
         String[] databaseList = obj.list();
         StringBuilder builder = new StringBuilder();
 //        ArrayList<String> databaseCheckerList = new ArrayList<>();
@@ -63,20 +62,20 @@ public class ErdGenerator {
                     columnNames.add(temp[0].trim());
                     columnDataTypes.add(temp[1].trim());
                 }
-                String prefix = "";
+               // String prefix = "";
 //                builder.append("CREATE TABLE " + tableName + "( ");
                 System.out.println("============ Table: "+tableName+" ===============");
                 for (int index = 0; index < columnNames.size(); index++) {
 //                    builder.append(prefix);
 //                    builder.append(columnNames.get(index)).append(" ").append(columnDataTypes.get(index));
                     System.out.println(columnNames + " " + columnDataTypes);
-                    prefix = ", ";
+                 //   prefix = ", ";
                 }
                 System.out.println("===============END OF TABLE=======================");
                 System.out.println("Primary key: "+"//add pk variable");
                 System.out.println("Foregin key: "+"//add fk variable");
                 builder.append(");\n");
-                String line;
+                //String line;
 //                while ((line = bufferedReader.readLine()) != null) {
 //                    String[] rowData = line.split(delimeter1);
 //                    String insertQuery = "INSERT INTO " + tableName + " VALUES(";
