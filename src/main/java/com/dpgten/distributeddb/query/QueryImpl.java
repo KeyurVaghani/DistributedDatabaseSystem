@@ -5,8 +5,10 @@ import com.dpgten.distributeddb.userauthentication.User;
 
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 
 import static com.dpgten.distributeddb.utils.Utils.*;
+import static com.dpgten.distributeddb.query.QueryParser.*;
 
 public class QueryImpl {
     public boolean executeQuery(User user) {
@@ -41,6 +43,11 @@ public class QueryImpl {
                 }
             } else if (validator.isCreateTableQuery(inputQuery)) {
                 TableQuery tableQuery = new TableQuery();
+                Matcher matcher = CREATE_TABLE_PATTERN.matcher(inputQuery);
+                String tableName = "";
+                if(matcher.find()){
+                    tableName = matcher.group(1);
+                }
                 tableQuery.createTable(inputQuery, currentDatabase);
             } else if (validator.isCreateQuery(inputQuery)) {
                 dbQuery.createDatabase(inputQuery);
