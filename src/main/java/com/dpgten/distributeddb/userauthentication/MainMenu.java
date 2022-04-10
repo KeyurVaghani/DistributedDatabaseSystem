@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.userauthentication;
 
+import com.dpgten.distributeddb.erd.ErdGenerator;
 import com.dpgten.distributeddb.query.QueryImpl;
 import com.dpgten.distributeddb.sqldump.SqlDump;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class MainMenu {
         Scanner scanner = new Scanner(System.in);
         while (loopCheck) {
             System.out.println("\nMain Menu");
-            System.out.println("Press 1 ==> Process Query\nPress 2 ==> Generate SQL Dump\nPress 3 ==> Generate ERD \nPress 4 ==> Logout");
+            System.out.println("Press 1 ==> Process Query\nPress 2 ==> Generate SQL Dump\nPress 3 ==> Generate ERD \nPress 4 ==> View Analytics\nPress 5 ==> Logout");
             System.out.print("Enter your Choice::: ");
             String selectedOption = scanner.nextLine();
             switch (selectedOption) {
@@ -37,9 +38,15 @@ public class MainMenu {
                     break;
                 case "3":
                     //ERD generator
+                    ErdGenerator erdGenerator = new ErdGenerator();
+                    erdGenerator.generateRequiredERD();
                     System.out.println("generating ERD");
                     break;
                 case "4":
+                    //View Analytics
+//                    System.out.println("Fetch data from file");
+                    break;
+                case "5":
                     loopCheck = false;
                     break;
                 default:
