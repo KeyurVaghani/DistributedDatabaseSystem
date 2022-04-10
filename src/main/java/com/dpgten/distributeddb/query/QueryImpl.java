@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.access.RestCallController;
 import com.dpgten.distributeddb.userauthentication.User;
 
 import java.util.Locale;

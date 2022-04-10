@@ -58,6 +58,25 @@ public class MetadataUtils {
         return "";
     }
 
+    public String getVMInstance(String currentTableName){
+        File metadataFile = new File(GLOBAL_METADATA);
+        try {
+            Scanner metadataScanner = new Scanner(metadataFile);
+            while(metadataScanner.hasNext()){
+                String row = metadataScanner.nextLine();
+                String instanceType = row.split(PRIMARY_DELIMITER_REGEX)[0];
+                String databaseName = row.split(PRIMARY_DELIMITER_REGEX)[1];
+                String tableName = row.split(PRIMARY_DELIMITER_REGEX)[2];
+                if(currentTableName.equals(tableName)){
+                    return instanceType;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+        return "";
+    }
+
 //    public String findTableInServer(String tableName){
 //        File metaData = new File(GLOBAL_METADATA);
 //        try {

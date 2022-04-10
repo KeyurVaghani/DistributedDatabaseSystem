@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.access.RestCallController;
 import com.dpgten.distributeddb.utils.MetadataUtils;
 
 import java.io.*;
@@ -12,22 +13,28 @@ import static com.dpgten.distributeddb.utils.Utils.*;
 
 public class TableQuery {
 
-    public void selectRows(String inputQuery){
+    RestCallController restCallController= new RestCallController();
+
+    public List<String> selectRows(String inputQuery){
         Matcher selectRowsMatcher = SELECT_TABLE_WHERE_PATTERN.matcher(inputQuery);
         String tablePath = "";
-
+        List<String> selectRows = new ArrayList<>();
         if(selectRowsMatcher.find()){
             MetadataUtils mdUtils = new MetadataUtils();
             tablePath = mdUtils.getTablePath(selectRowsMatcher.group(8));
+            String instance = mdUtils.getVMInstance(selectRowsMatcher.group(8));
+            String [] result= restCallController.selectRestCall(inputQuery, instance);
         }
+
         File tableFile = new File(tablePath);
         int result = selectRowsMatcher.groupCount();
         if(selectRowsMatcher.group(9) != null){
             String columnName = selectRowsMatcher.group(10);
             String columnValue = selectRowsMatcher.group(11);
-            List<String> selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
+            selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
             selectRows.forEach(System.out::println);
         }
+        return selectRows;
     }
 
     public void updateRow(String inputQuery){
