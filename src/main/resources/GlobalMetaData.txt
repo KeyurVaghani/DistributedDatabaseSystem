@@ -1,3 +1,6 @@
 VM1|db1|tb1
+VM1|db1|table1
+VM1|db1|student
 VM1|db2|tb2
-VM2|db1|tb3
+VM2|db2|table2
+VM2|db2|table3

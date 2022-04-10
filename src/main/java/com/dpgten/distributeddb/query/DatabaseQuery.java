@@ -28,6 +28,9 @@ public class DatabaseQuery {
     String database1Path;
     String database2Path;
 
+    FileResourceUtils fileResourceUtils = new FileResourceUtils();
+    MetadataUtils metadataUtils = new MetadataUtils();
+
     public DatabaseQuery(String server1, String server2, String currentUser) {
         this.server1 = new File(server1);
         this.server2 = new File(server2);
@@ -46,6 +49,8 @@ public class DatabaseQuery {
             MetadataUtils mdUtils = new MetadataUtils();
             if (!mdUtils.isDatabaseExist(databaseName)) {
                 database.mkdir();
+//                fileResourceUtils.appendToFile(database, "VM1|")
+                System.out.println("database " + databaseName + " Created.");
             } else {
                 System.out.println("database " + databaseName + " already exists");
             }
@@ -118,8 +123,8 @@ public class DatabaseQuery {
     }
 
     public String selectDatabase(String selectDb) {
-        File server1 = new File(SERVER_1);
-        File server2 = new File(SERVER_2);
+//        File server1 = new File(SERVER_1);
+//        File server2 = new File(SERVER_2);
 
         Matcher useQueryMatcher = USE_DATABASE_PATTERN.matcher(selectDb);
         String databaseName = "";
@@ -138,9 +143,11 @@ public class DatabaseQuery {
 
 //        if(!currentUserPath1.equals("")){
         this.databasePath = searchDatabase(SCHEMA, databaseName);
-        if (databasePath.equals("")) {
+//        this.databasePath = searchDatabase(SCHEMA, databaseName);
+        boolean exists = metadataUtils.isDatabaseExist(databaseName);
+        if (!exists) {
             System.out.println("Database does not exists");
-            return databaseName;
+            return "";
         }
         return databaseName;
     }

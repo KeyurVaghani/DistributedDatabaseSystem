@@ -13,7 +13,7 @@ import static com.dpgten.distributeddb.utils.Utils.*;
 public class TableQuery {
 
     public void selectRows(String inputQuery){
-        Matcher selectRowsMatcher = SELECT_TABLE_PATTERN.matcher(inputQuery);
+        Matcher selectRowsMatcher = SELECT_TABLE_WHERE_PATTERN.matcher(inputQuery);
         String tablePath = "";
 
         if(selectRowsMatcher.find()){
@@ -21,7 +21,7 @@ public class TableQuery {
             tablePath = mdUtils.getTablePath(selectRowsMatcher.group(8));
         }
         File tableFile = new File(tablePath);
-
+        int result = selectRowsMatcher.groupCount();
         if(selectRowsMatcher.group(9) != null){
             String columnName = selectRowsMatcher.group(10);
             String columnValue = selectRowsMatcher.group(11);
@@ -59,6 +59,7 @@ public class TableQuery {
         }
         try {
             Scanner tableScanner = new Scanner(tableFile);
+            tableScanner.nextLine();
             tableScanner.nextLine();
             String columnHeader = tableScanner.nextLine();
             String[] headers = columnHeader.split(PRIMARY_DELIMITER_REGEX);

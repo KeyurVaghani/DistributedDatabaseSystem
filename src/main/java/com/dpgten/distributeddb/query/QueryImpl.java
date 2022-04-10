@@ -27,7 +27,12 @@ public class QueryImpl {
                 currentDatabase = dbQuery.selectDatabase(inputQuery);
                 System.out.println(YELLOW + "Database selected. Current Database is " + BLUE + currentDatabase + YELLOW + "." + RESET);
             } else if (currentDatabase.isEmpty()) {
-                System.out.println(RED + "No Database selected, please select database!" + RESET);
+                if(validator.isCreateQuery(inputQuery)){
+                    dbQuery.createDatabase(inputQuery);
+                }
+                else {
+                    System.out.println(RED + "No Database selected, please select database!" + RESET);
+                }
             } else if (validator.isCreateTableQuery(inputQuery)) {
                 TableQuery tableQuery = new TableQuery();
                 tableQuery.createTable(inputQuery, currentDatabase);

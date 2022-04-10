@@ -19,7 +19,7 @@ public class MetadataUtils {
             Scanner metaDataScanner = new Scanner(globalMetaData);
             while (metaDataScanner.hasNext()){
                 String row = metaDataScanner.nextLine();
-                String server = row.split(PRIMARY_DELIMITER_REGEX)[0];
+                String server = row.split(PRIMARY_DELIMITER_REGEX)[1];
                 String databaseName = row.split(PRIMARY_DELIMITER_REGEX)[1];
                 if(server.equals(serverName)){
                     databaseList.add(databaseName);
