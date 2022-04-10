@@ -2,7 +2,9 @@ package com.dpgten.distributeddb.query;
 
 import com.dpgten.distributeddb.access.RestCallController;
 import com.dpgten.distributeddb.userauthentication.User;
+import com.dpgten.distributeddb.utils.MetadataUtils;
 
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -16,7 +18,7 @@ public class QueryImpl {
 //        String currentUser = user.getUsername();
         String currentDatabase = "";
 
-
+        RestCallController restCallController= new RestCallController();
         String inputQuery = "1";
 
         DatabaseQuery dbQuery = new DatabaseQuery();
@@ -52,7 +54,15 @@ public class QueryImpl {
                 dbQuery.createDatabase(inputQuery);
             } else if (validator.isSelectQuery(inputQuery)) {
                 TableQuery tblQuery = new TableQuery();
-                tblQuery.selectRows(inputQuery);
+                Matcher selectorMatcher = SELECT_TABLE_WHERE_PATTERN.matcher(inputQuery);
+                if(selectorMatcher.find()){
+                    String tableName = selectorMatcher.group(8);
+                    MetadataUtils mdUtils = new MetadataUtils();
+                    String instance = mdUtils.getVMInstance(tableName);
+                    String [] result= restCallController.selectRestCall(inputQuery, instance);
+                    Arrays.asList(result).forEach(System.out::println);
+                }
+//                tblQuery.selectRows(inputQuery);
             } else if (validator.isInsertQuery(inputQuery)) {
                 TableQuery tableQuery = new TableQuery();
                 tableQuery.insertRow(inputQuery);

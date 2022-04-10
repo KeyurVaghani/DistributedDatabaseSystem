@@ -41,7 +41,7 @@ public class AccessController {
         } else {
             baseURL = localURL;
         }
-        System.out.println("Base URL is--> " + baseURL);
+//        System.out.println("Base URL is--> " + baseURL);
     }
 
 

@@ -14,7 +14,7 @@ import static com.dpgten.distributeddb.utils.Utils.*;
 
 public class TableQuery {
 
-    RestCallController restCallController= new RestCallController();
+
 
     public List<String> selectRows(String inputQuery){
         Matcher selectRowsMatcher = SELECT_TABLE_WHERE_PATTERN.matcher(inputQuery);
@@ -23,7 +23,7 @@ public class TableQuery {
         if(selectRowsMatcher.find()){
             MetadataUtils mdUtils = new MetadataUtils();
             tablePath = mdUtils.getTablePath(selectRowsMatcher.group(8));
-            String instance = mdUtils.getVMInstance(selectRowsMatcher.group(8));
+//            String instance = mdUtils.getVMInstance(selectRowsMatcher.group(8));
 //            String [] result= restCallController.selectRestCall(inputQuery, instance);
         }
 
@@ -33,7 +33,7 @@ public class TableQuery {
             String columnName = selectRowsMatcher.group(10);
             String columnValue = selectRowsMatcher.group(11);
             selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
-            selectRows.forEach(System.out::println);
+//            selectRows.forEach(System.out::println);
         }else{
             FileResourceUtils fileUtils = new FileResourceUtils();
             fileUtils.printFile(tableFile);

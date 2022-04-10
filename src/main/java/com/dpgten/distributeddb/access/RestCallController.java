@@ -42,7 +42,7 @@ public class RestCallController {
 //        } else {
 //            baseURL = localURL;
 //        }
-        System.out.println("Base URL is--> " + baseURL);
+//        System.out.println("Base URL is--> " + baseURL);
     }
 
     public String[] selectRestCall(String query, String vmOption) {
