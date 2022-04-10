@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.dpgten.distributeddb.utils.Utils.YELLOW;
+
 public class SqlDump {
 
     //    private final String schema = "schema";
@@ -105,6 +107,7 @@ public class SqlDump {
             bufferedWriter.append(query + newline);
         }
         bufferedWriter.flush();
+        System.out.println(YELLOW+"SQL Dump Generated::File Available in resources");
     }
 
     private Map<Integer, String> getDataForCurrentTable(File table, Map<Integer, String> currentDataMap) throws IOException {

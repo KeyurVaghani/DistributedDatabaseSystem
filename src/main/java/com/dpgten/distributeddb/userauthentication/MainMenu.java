@@ -7,12 +7,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 
+import static com.dpgten.distributeddb.utils.Utils.*;
+import static com.dpgten.distributeddb.utils.Utils.RESET;
+
 @Data
 @Component
 public class MainMenu {
 
     public boolean drive(User user) {
-
+        System.out.println("\n" + YELLOW + "-----------------------Welcome " + user.getUsername() + "---------------------" + RESET);
+        System.out.println(BLUE + "AUTHENTICATION SUCCESS" + RESET);
         boolean loopCheck = true;
         Scanner scanner = new Scanner(System.in);
         while (loopCheck) {
@@ -27,6 +31,7 @@ public class MainMenu {
                     break;
                 case "2":
                     SqlDump dump = new SqlDump();
+                    System.out.print(YELLOW+"Enter database Name:"+RESET);
                     String databaseName = scanner.nextLine();
                     dump.generateDump(databaseName);
                     break;
@@ -41,6 +46,6 @@ public class MainMenu {
                     System.out.println("Invalid input try again");
             }
         }
-        return loopCheck;
+        return true;
     }
 }
