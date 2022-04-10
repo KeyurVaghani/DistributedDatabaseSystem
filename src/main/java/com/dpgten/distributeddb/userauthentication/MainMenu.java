@@ -3,9 +3,12 @@ package com.dpgten.distributeddb.userauthentication;
 import com.dpgten.distributeddb.erd.ErdGenerator;
 import com.dpgten.distributeddb.query.QueryImpl;
 import com.dpgten.distributeddb.sqldump.SqlDump;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 import static com.dpgten.distributeddb.utils.Utils.*;
@@ -34,12 +37,28 @@ public class MainMenu {
                     SqlDump dump = new SqlDump();
                     System.out.print(YELLOW+"Enter database Name:"+RESET);
                     String databaseName = scanner.nextLine();
-                    dump.generateDump(databaseName);
+                    try {
+                        dump.generateDump(databaseName);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSchException e) {
+                        e.printStackTrace();
+                    } catch (SftpException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case "3":
                     //ERD generator
                     ErdGenerator erdGenerator = new ErdGenerator();
-                    erdGenerator.generateRequiredERD();
+                    try {
+                        erdGenerator.generateRequiredERD();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSchException e) {
+                        e.printStackTrace();
+                    } catch (SftpException e) {
+                        e.printStackTrace();
+                    }
                     System.out.println("generating ERD");
                     break;
                 case "4":
