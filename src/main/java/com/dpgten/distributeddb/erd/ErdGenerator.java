@@ -72,6 +72,9 @@ public class ErdGenerator {
                     System.out.println(columnNames + " " + columnDataTypes);
                     prefix = ", ";
                 }
+                System.out.println("===============END OF TABLE=======================");
+                System.out.println("Primary key: "+"//add pk variable");
+                System.out.println("Foregin key: "+"//add fk variable");
                 builder.append(");\n");
                 String line;
 //                while ((line = bufferedReader.readLine()) != null) {
