@@ -2,7 +2,7 @@ package com.dpgten.constants;
 
 public class TransactionProcessingConstants {
 
-    public static final String LOCK_MANAGER_FILE_LOCATION = "src\\main\\resources\\LockManager.txt";
+    public static final String LOCK_MANAGER_FILE_LOCATION = "src/main/resources/schema/LockManager.txt";
     public static final String QUERY_EXECUTION_TIME = "QUERY_EXECUTION_TIME";
     public static final String CURRENT_DATABASE_STATE = "CURRENT_DATABASE_STATE";
     public static final String DATABASE_CHANGE_LOG = "DATABASE_CHANGES";

@@ -67,4 +67,13 @@ public class AccessController {
         String[] stringArray = result.toArray(new String[0]);
         return stringArray;
     }
+
+    @GetMapping("/query/insert")
+    public boolean insert(@RequestParam String query) {
+//        List <String> result = new ArrayList<>();
+        TableQuery tableQuery = new TableQuery();
+        boolean result = tableQuery.insertRow(query);
+//        String[] stringArray = result.toArray(new String[0]);
+        return result;
+    }
 }

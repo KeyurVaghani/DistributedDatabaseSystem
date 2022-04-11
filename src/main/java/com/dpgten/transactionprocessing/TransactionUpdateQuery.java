@@ -225,13 +225,13 @@ public class TransactionUpdateQuery {
     }
 
     private boolean checkIfTableExists(String selectedDatabase, String tableName) {
-        File file = new File("src\\main\\resources\\schema\\" + selectedDatabase + "\\" + tableName + ".txt");
+        File file = new File("src/main/resources/schema/" + selectedDatabase + "/" + tableName + ".txt");
         return file.exists();
     }
 
     public Map<Integer, String> getTableRows(String selectedDatabase, String tableName) throws IOException {
         Map<Integer, String> tableMap = new HashMap<>();
-        String tableFile = "src\\main\\resources\\schema\\" + selectedDatabase + "\\" + tableName + ".txt";
+        String tableFile = "src/main/resources/schema/" + selectedDatabase + "/" + tableName + ".txt";
         BufferedReader reader = new BufferedReader(new FileReader(tableFile));
         String line;
         int lineCount = 1;

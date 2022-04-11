@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class QueryLogs {
 
-    private final String QUERY_LOG_FILE_LOCATION = "src\\main\\resources\\logs\\QueryLogs.txt";
+    private final String QUERY_LOG_FILE_LOCATION = "src/main/resources/logs/QueryLogs.txt";
 
     private static QueryLogs queryLogsInstance = null;
 
@@ -68,6 +68,9 @@ public class QueryLogs {
         }
         if (queryLogMap.containsKey(TransactionProcessingConstants.DATA_CHANGED_BY_QUERY)) {
             buffer.append("[").append("Data Changed by query : ").append(queryLogMap.get(TransactionProcessingConstants.DATA_CHANGED_BY_QUERY)).append("]").append(" ");
+        }
+        if (queryLogMap.containsKey(TransactionProcessingConstants.QUERY_EXECUTION_TIME)) {
+            buffer.append("[").append("Query Execution Time : ").append(queryLogMap.get(TransactionProcessingConstants.QUERY_EXECUTION_TIME)).append("]").append(" ");
         }
         this.bufferedWriter.newLine();
         this.bufferedWriter.append(buffer.toString());
