@@ -33,7 +33,7 @@ public class TestRestTemplateController {
         } else {
             baseURL = localURL;
         }
-        System.out.println("Base URL is--> " + baseURL);
+//        System.out.println("Base URL is--> " + baseURL);
     }
 
 //    @RequestMapping(value = "/template/products", method = RequestMethod.POST)

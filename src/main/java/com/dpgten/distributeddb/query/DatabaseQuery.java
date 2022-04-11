@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.analytics.DatabaseAnalytics;
 import com.dpgten.distributeddb.utils.FileResourceUtils;
 import com.dpgten.distributeddb.utils.MetadataUtils;
 import lombok.AllArgsConstructor;
@@ -7,10 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 
 import static com.dpgten.distributeddb.query.QueryParser.*;
@@ -27,6 +26,11 @@ public class DatabaseQuery {
     File server2;
     String database1Path;
     String database2Path;
+    DatabaseAnalytics databaseAnalytics = new DatabaseAnalytics();
+
+
+    FileResourceUtils fileResourceUtils = new FileResourceUtils();
+    MetadataUtils metadataUtils = new MetadataUtils();
 
     public DatabaseQuery(String server1, String server2, String currentUser) {
         this.server1 = new File(server1);
@@ -46,31 +50,13 @@ public class DatabaseQuery {
             MetadataUtils mdUtils = new MetadataUtils();
             if (!mdUtils.isDatabaseExist(databaseName)) {
                 database.mkdir();
+//                fileResourceUtils.appendToFile(database, "VM1|")
+                System.out.println("database " + databaseName + " Created.");
+                databaseAnalytics.setDATABASE_QUERY_COUNT(databaseAnalytics.DATABASE_QUERY_COUNT+1);
             } else {
                 System.out.println("database " + databaseName + " already exists");
             }
         }
-    }
-
-
-    public boolean isUseQuery(String inputQuery) {
-        Matcher queryMatcher = USE_DATABASE_PATTERN.matcher(inputQuery);
-        return queryMatcher.find();
-    }
-
-    public boolean isCreateTableQuery(String inputQuery) {
-        Matcher queryMatcher = CREATE_TABLE_PATTERN.matcher(inputQuery);
-        return queryMatcher.find();
-    }
-
-    public boolean isCreateQuery(String inputQuery) {
-        Matcher queryMatcher = CREATE_DATABASE_PATTERN.matcher(inputQuery);
-        return queryMatcher.find();
-    }
-
-    public boolean isSelectQuery(String inputQuery) {
-        Matcher queryMatcher = SELECT_TABLE_PATTERN.matcher(inputQuery);
-        return queryMatcher.find();
     }
 
     public boolean isDeleteQuery(String inputQuery) {
@@ -78,49 +64,7 @@ public class DatabaseQuery {
         return queryMatcher.find();
     }
 
-    public void selectRows(String inputQuery) {
-        Matcher selectRowsMatcher = SELECT_TABLE_PATTERN.matcher(inputQuery);
-        String tableName = "";
-        String tablePath = "";
-        String databaseName = "";
-        if (selectRowsMatcher.find()) {
-            tableName = selectRowsMatcher.group(8);
-            tablePath = SERVERS + "/" + findTableInDatabase(tableName);
-        }
-
-        File table = new File(tablePath + "/" + tableName + ".txt");
-        FileResourceUtils fileUtils = new FileResourceUtils();
-        fileUtils.printFile(table);
-    }
-
-    public String findTableInDatabase(String tableName) {
-        File metaData = new File(GLOBAL_METADATA);
-        String server = "";
-
-        try {
-            Scanner fileScanner = new Scanner(metaData);
-            while (fileScanner.hasNext()) {
-                String row = fileScanner.next();
-                if (Arrays.asList(row.split("\\|")).contains(tableName)) {
-                    server = row.split("\\|")[0] + "/" + row.split("\\|")[1];
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return server;
-    }
-
-    public boolean isTableExists(String tableName) {
-
-
-        return false;
-    }
-
     public String selectDatabase(String selectDb) {
-        File server1 = new File(SERVER_1);
-        File server2 = new File(SERVER_2);
-
         Matcher useQueryMatcher = USE_DATABASE_PATTERN.matcher(selectDb);
         String databaseName = "";
 
@@ -138,9 +82,11 @@ public class DatabaseQuery {
 
 //        if(!currentUserPath1.equals("")){
         this.databasePath = searchDatabase(SCHEMA, databaseName);
-        if (databasePath.equals("")) {
+//        this.databasePath = searchDatabase(SCHEMA, databaseName);
+        boolean exists = metadataUtils.isDatabaseExist(databaseName);
+        if (!exists) {
             System.out.println("Database does not exists");
-            return databaseName;
+            return "";
         }
         return databaseName;
     }

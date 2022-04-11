@@ -58,7 +58,7 @@ public class LoginMenu {
     public void userFirstMenu() {
         boolean loopCheck = true;
         while (loopCheck) {
-            System.out.println("\nMain Menu");
+            System.out.println("\nLogin Menu");
             System.out.println("Press 1 ==> User Login\nPress 2 ==> Register new user\nPress 3 ==> Exit");
             System.out.print("Enter your Choice::: ");
             String selectedOption = scanner.nextLine();
@@ -70,7 +70,9 @@ public class LoginMenu {
                     } else {
                         System.out.println("Calling query executor");
                         QueryImpl queryImpl = new QueryImpl();
-                        loopCheck = queryImpl.executeQuery(user);
+                        MainMenu menu = new MainMenu();
+                        loopCheck = menu.drive(user);
+//                        loopCheck = queryImpl.executeQuery(user);
 //                        loopCheck = false;
                     }
                     break;
