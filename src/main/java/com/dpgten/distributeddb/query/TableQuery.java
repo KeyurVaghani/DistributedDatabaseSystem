@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.analytics.DatabaseAnalytics;
 import com.dpgten.distributeddb.utils.FileResourceUtils;
 import com.dpgten.distributeddb.access.RestCallController;
 import com.dpgten.distributeddb.utils.MetadataUtils;
@@ -34,6 +35,7 @@ public class TableQuery {
             String columnValue = selectRowsMatcher.group(11);
             selectRows = executeWhere(tableFile,columnName,columnValue,inputQuery);
 //            selectRows.forEach(System.out::println);
+            DatabaseAnalytics.SELECT_QUERY_COUNT++;
         }else{
             FileResourceUtils fileUtils = new FileResourceUtils();
             fileUtils.printFile(tableFile);
@@ -66,6 +68,7 @@ public class TableQuery {
                     FileWriter tableWriter = new FileWriter(tableFile);
                     tableWriter.write(updatedFile.toString());
                     tableWriter.close();
+                    DatabaseAnalytics.UPDATE_QUERY_COUNT++;
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                 }
@@ -207,6 +210,7 @@ public class TableQuery {
 
             MetadataUtils mdUtils = new MetadataUtils();
             mdUtils.createTableEntry(tableName,databaseName);
+            DatabaseAnalytics.CREATE_QUERY_COUNT++;
         } catch (IOException e) {
             System.out.println("ERROR IN INSERTING THE COLUMNS");
             System.out.println(e.getMessage());
@@ -265,6 +269,7 @@ public class TableQuery {
                 List<String> alist=Arrays.asList(list);
                bw.append("\n");
                bw.append(alist.stream().map(Object::toString).collect(Collectors.joining(PRIMARY_DELIMITER)));
+               DatabaseAnalytics.INSERT_QUERY_COUNT++;
             }
         } catch (IOException e) {
             e.printStackTrace();

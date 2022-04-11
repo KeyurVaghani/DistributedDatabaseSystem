@@ -1,6 +1,7 @@
 package com.dpgten.distributeddb.query;
 
 import com.dpgten.distributeddb.access.RestCallController;
+import com.dpgten.distributeddb.analytics.DatabaseAnalytics;
 import com.dpgten.distributeddb.userauthentication.User;
 import com.dpgten.distributeddb.utils.MetadataUtils;
 
@@ -13,6 +14,8 @@ import static com.dpgten.distributeddb.utils.Utils.*;
 import static com.dpgten.distributeddb.query.QueryParser.*;
 
 public class QueryImpl {
+    DatabaseAnalytics databaseAnalytics = new DatabaseAnalytics();
+
     public boolean executeQuery(User user) {
 
 //        String currentUser = user.getUsername();
@@ -80,6 +83,7 @@ public class QueryImpl {
             System.out.println("please type " + RED + "2" + RESET + " to Exit");
             System.out.print("Enter option here ==>");
             inputQuery = input.nextLine();
+            DatabaseAnalytics.TOTAL_QUERY_COUNT++;
         }
         return true;
     }
