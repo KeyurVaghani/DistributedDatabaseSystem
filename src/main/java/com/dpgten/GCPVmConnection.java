@@ -10,7 +10,7 @@ public class GCPVmConnection {
 
     public ChannelSftp connectVM() throws JSchException, SftpException {
         JSch jSch = new JSch();
-        jSch.addIdentity("/home/saivikas_chinthirla/id_rsa");
+        jSch.addIdentity("/home/gandhirajan1997/id_rsa");
         Session session = jSch.getSession("avuser", "34.136.6.35", 22);
         session.setConfig("StrictHostKeyChecking", "no");
         System.out.println("Establishing Connection...");
