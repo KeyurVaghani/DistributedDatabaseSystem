@@ -1,5 +1,7 @@
 package com.dpgten.distributeddb.userauthentication;
 
+import com.dpgten.distributeddb.analytics.AnalyticsOutput;
+import com.dpgten.distributeddb.analytics.DatabaseAnalytics;
 import com.dpgten.distributeddb.erd.ErdGenerator;
 import com.dpgten.distributeddb.query.QueryImpl;
 import com.dpgten.distributeddb.sqldump.SqlDump;
@@ -62,6 +64,7 @@ public class MainMenu {
                     System.out.println("generating ERD");
                     break;
                 case "4":
+                    AnalyticsOutput da = new AnalyticsOutput();
                     //View Analytics
 //                    System.out.println("Fetch data from file");
                     break;
