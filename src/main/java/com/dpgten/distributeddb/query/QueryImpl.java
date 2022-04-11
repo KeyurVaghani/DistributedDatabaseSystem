@@ -3,14 +3,16 @@ package com.dpgten.distributeddb.query;
 import com.dpgten.distributeddb.access.RestCallController;
 import com.dpgten.distributeddb.userauthentication.User;
 import com.dpgten.distributeddb.utils.MetadataUtils;
+import com.dpgten.transactionprocessing.TransactionQueryExecution;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 
-import static com.dpgten.distributeddb.utils.Utils.*;
 import static com.dpgten.distributeddb.query.QueryParser.*;
+import static com.dpgten.distributeddb.utils.Utils.*;
 
 public class QueryImpl {
     public boolean executeQuery(User user) {
@@ -18,7 +20,7 @@ public class QueryImpl {
 //        String currentUser = user.getUsername();
         String currentDatabase = "";
 
-        RestCallController restCallController= new RestCallController();
+        RestCallController restCallController = new RestCallController();
         String inputQuery = "1";
 
         DatabaseQuery dbQuery = new DatabaseQuery();
@@ -29,24 +31,23 @@ public class QueryImpl {
             inputQuery = input.nextLine();
             if (validator.isUseQuery(inputQuery)) {
                 currentDatabase = dbQuery.selectDatabase(inputQuery);
-                if(currentDatabase.isEmpty()){
+                if (currentDatabase.isEmpty()) {
                     System.out.println(RED + "DATABASE NOT FOUND" + RESET);
-                }else {
+                } else {
                     System.out.println(YELLOW + "Database selected. Current Database is "
                             + BLUE + currentDatabase + YELLOW + "." + RESET);
                 }
             } else if (currentDatabase.isEmpty()) {
-                if(validator.isCreateQuery(inputQuery)){
+                if (validator.isCreateQuery(inputQuery)) {
                     dbQuery.createDatabase(inputQuery);
-                }
-                else {
+                } else {
                     System.out.println(RED + "No Database selected, please select database!" + RESET);
                 }
             } else if (validator.isCreateTableQuery(inputQuery)) {
                 TableQuery tableQuery = new TableQuery();
                 Matcher matcher = CREATE_TABLE_PATTERN.matcher(inputQuery);
                 String tableName = "";
-                if(matcher.find()){
+                if (matcher.find()) {
                     tableName = matcher.group(1);
                 }
                 tableQuery.createTable(inputQuery, currentDatabase);
@@ -55,24 +56,43 @@ public class QueryImpl {
             } else if (validator.isSelectQuery(inputQuery)) {
                 TableQuery tblQuery = new TableQuery();
                 Matcher selectorMatcher = SELECT_TABLE_WHERE_PATTERN.matcher(inputQuery);
-                if(selectorMatcher.find()){
+                if (selectorMatcher.find()) {
                     String tableName = selectorMatcher.group(8);
                     MetadataUtils mdUtils = new MetadataUtils();
                     String instance = mdUtils.getVMInstance(tableName);
-                    String [] result= restCallController.selectRestCall(inputQuery, instance);
+                    String[] result = restCallController.selectRestCall(inputQuery, instance);
                     Arrays.asList(result).forEach(System.out::println);
                 }
 //                tblQuery.selectRows(inputQuery);
             } else if (validator.isInsertQuery(inputQuery)) {
+                Matcher queryMatcher = INSERT_TABLE_PATTERN.matcher(inputQuery);
+                String tableName = "";
                 TableQuery tableQuery = new TableQuery();
-                tableQuery.insertRow(inputQuery);
-            }else if(validator.isUpdateQuery(inputQuery)){
+                if (queryMatcher.find()) {
+                    tableName = queryMatcher.group(1);
+                    MetadataUtils mdUtils = new MetadataUtils();
+                    String instance = mdUtils.getVMInstance(tableName);
+                    boolean result = restCallController.insertRestCall(inputQuery, instance);
+                    if (result) {
+                        System.out.println("Inserted successfully");
+                    }
+                } else {
+                    System.out.println("Insert failed error");
+                }
+//                tableQuery.insertRow(inputQuery);
+            } else if (validator.isUpdateQuery(inputQuery)) {
                 TableQuery tableQuery = new TableQuery();
                 tableQuery.updateRow(inputQuery);
-            }
-            else if (dbQuery.isDeleteQuery(inputQuery)) {
+            } else if (dbQuery.isDeleteQuery(inputQuery)) {
                 DeleteQueryParser deleteQueryParser = new DeleteQueryParser();
                 deleteQueryParser.executeDeleteQueryWithConditionQuery(inputQuery, user);
+            } else if (inputQuery.equalsIgnoreCase("BEGIN TRANSACTION") || inputQuery.equalsIgnoreCase("START TRANSACTION")) {
+                TransactionQueryExecution transactionQueryExecution = new TransactionQueryExecution();
+                try {
+                    transactionQueryExecution.startTransaction(currentDatabase);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else {
                 System.out.println(RED + "PLEASE ENTER VALID QUERY" + RESET + "\n");
             }

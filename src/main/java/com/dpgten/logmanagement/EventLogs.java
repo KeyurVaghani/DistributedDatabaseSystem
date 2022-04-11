@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Map;
 
 public class EventLogs {
-private final String EVENT_LOG_FILE_LOCATION = "src\\main\\resources\\logs\\EventLogs.txt";
+private final String EVENT_LOG_FILE_LOCATION = "src/main/resources/logs/EventLogs.txt";
 
     private static EventLogs eventLogsInstance = null;
 
@@ -47,9 +47,9 @@ private final String EVENT_LOG_FILE_LOCATION = "src\\main\\resources\\logs\\Even
         long currentTimeMillis = System.currentTimeMillis();
         Date date = new Date(currentTimeMillis);
         buffer.append("[").append(date).append("]").append(" ");
-        buffer.append("[");
+//        buffer.append("[");
         if (eventLogMap.containsKey(TransactionProcessingConstants.DATABASE_CHANGE_LOG)) {
-            buffer.append("The New Changes in Database are : ").append(eventLogMap.get(TransactionProcessingConstants.DATABASE_CHANGE_LOG)).append("]").append(" ");
+            buffer.append("[").append("The New Changes in Database are : ").append(eventLogMap.get(TransactionProcessingConstants.DATABASE_CHANGE_LOG)).append("]").append(" ");
         }
         buffer.append("[");
         if (eventLogMap.containsKey(TransactionProcessingConstants.CONCURRENT_TRANSACTION_LOG)) {

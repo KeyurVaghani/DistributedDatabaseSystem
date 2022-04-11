@@ -74,4 +74,22 @@ public class RestCallController {
         return responseString;
     }
 
+
+    public boolean insertRestCall(String query, String vmOption) {
+
+        String resourceUrl = "http://"+ vmOption + ":8087/access/query/insert";
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(resourceUrl)
+                .queryParam("query", query);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(null, null);
+        ResponseEntity<Boolean> response = restTemplate.exchange(builder.buildAndExpand().toUri(),HttpMethod.GET, requestEntity , boolean.class);
+
+        boolean responseString = false;
+        try {
+             responseString = response.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseString;
+    }
 }

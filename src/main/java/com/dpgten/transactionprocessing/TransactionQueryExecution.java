@@ -7,6 +7,9 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static com.dpgten.distributeddb.utils.Utils.RESET;
+import static com.dpgten.distributeddb.utils.Utils.YELLOW;
+
 /**
  *
  * @author   Sai Vikas Chinthirla
@@ -37,7 +40,7 @@ public class TransactionQueryExecution {
         for (String queryString: queriesList) {
             String[] querySplit = queryString.split(" ");
             String tableName = null;
-            System.out.println(Arrays.toString(querySplit));
+//            System.out.println(Arrays.toString(querySplit));
             if (queryString.toLowerCase().contains("select")) {
                 tableName = querySplit[3];
                 dataMap = checkTableLocking(queryString, tableName, selectedDatabase, dataMap);
@@ -64,6 +67,7 @@ public class TransactionQueryExecution {
             }
         }
         long endTime = System.nanoTime();
+        transactionMap.put(TransactionProcessingConstants.QUERY_EXECUTION_TIME, "Total query execution Time : " + (endTime - startTime));
         transactionMap.put(TransactionProcessingConstants.CONCURRENT_TRANSACTION_LOG, "Total Transaction Execution Time : " + (endTime - startTime));
         LogWriterService.getLogWriterServiceInstance().write(transactionMap);
     }
@@ -144,19 +148,20 @@ public class TransactionQueryExecution {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(tableLocation, true));
 //            bufferedWriter.newLine();
-            bufferedWriter.append(value + newline);
+            bufferedWriter.append(newline + value);
             bufferedWriter.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        transactionMap.put(TransactionProcessingConstants.EXECUTED_QUERY_BY_USER, "inserted the date");
-        System.out.println("1 row affected");
+//        transactionMap.put(TransactionProcessingConstants.EXECUTED_QUERY_BY_USER, "inserted the date");
+        System.out.println(YELLOW +"1 row affected" + RESET);
     }
 
     public Map checkTableLocking(String queryString, String tableName, String selectedDatabase, Map dataMap) throws IOException {
 
         if (!checkIfTableIsLocked(tableName)) {
             acquireLocks(tableName);
+            transactionMap.put(TransactionProcessingConstants.EXECUTED_QUERY_BY_USER, queryString);
             transactionMap.put(TransactionProcessingConstants.CONCURRENT_TRANSACTION_LOG, "LOCK applied on table " + tableName);
 //            dataMap = getTableRows(selectedDatabase, tableName);
             return processQuery(queryString, dataMap, selectedDatabase, tableName);
@@ -188,7 +193,7 @@ public class TransactionQueryExecution {
     }
 
     public boolean checkIfTableIsLocked(String tableName) throws IOException {
-        String lockMangerLocation = "src\\main\\resources\\schema\\LockManager.txt";
+        String lockMangerLocation = "src/main/resources/schema/LockManager.txt";
         BufferedReader bufferedReader = new BufferedReader(new FileReader(TransactionProcessingConstants.LOCK_MANAGER_FILE_LOCATION));
         String line = null;
         while ((line = bufferedReader.readLine()) != null) {
@@ -211,7 +216,7 @@ public class TransactionQueryExecution {
     }
 
     private void createTempTable(Map<Integer, String> dataMap, String tableName, String selectedDatabase) {
-        String tempFilePath = "src\\main\\resources\\schema\\" + selectedDatabase + "\\" + tableName + ".txt";
+        String tempFilePath = "src/main/resources/schema/" + selectedDatabase + "/" + tableName + ".txt";
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFilePath));
             dataMap.keySet().forEach(key -> {
@@ -253,7 +258,7 @@ public class TransactionQueryExecution {
 
     public Map<Integer, String> getTableRows(String selectedDatabase, String tableName) throws IOException {
         Map<Integer, String> tableMap = new HashMap<>();
-        String tableFileLocation = "src\\main\\resources\\schema\\" + selectedDatabase + "\\" + tableName + ".txt";
+        String tableFileLocation = "src/main/resources/schema/" + selectedDatabase + "/" + tableName + ".txt";
         BufferedReader reader = new BufferedReader(new FileReader(tableFileLocation));
         String line;
         int lineCount = 1;
