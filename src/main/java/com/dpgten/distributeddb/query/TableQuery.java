@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.analytics.DatabaseAnalytics;
 import com.dpgten.distributeddb.utils.FileResourceUtils;
 import com.dpgten.distributeddb.utils.MetadataUtils;
 
@@ -32,7 +33,8 @@ public class TableQuery {
             String columnValue = selectRowsMatcher.group(11);
             selectRows = executeWhere(tableFile, columnName, columnValue, inputQuery);
 //            selectRows.forEach(System.out::println);
-        } else {
+            DatabaseAnalytics.SELECT_QUERY_COUNT++;
+        }else{
             FileResourceUtils fileUtils = new FileResourceUtils();
             fileUtils.printFile(tableFile);
         }
@@ -64,6 +66,7 @@ public class TableQuery {
                     FileWriter tableWriter = new FileWriter(tableFile);
                     tableWriter.write(updatedFile.toString());
                     tableWriter.close();
+                    DatabaseAnalytics.UPDATE_QUERY_COUNT++;
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                 }
@@ -204,7 +207,8 @@ public class TableQuery {
             writeHeader.close();
 
             MetadataUtils mdUtils = new MetadataUtils();
-            mdUtils.createTableEntry(tableName, databaseName);
+            mdUtils.createTableEntry(tableName,databaseName);
+            DatabaseAnalytics.CREATE_QUERY_COUNT++;
         } catch (IOException e) {
             System.out.println("ERROR IN INSERTING THE COLUMNS");
             System.out.println(e.getMessage());
@@ -258,11 +262,12 @@ public class TableQuery {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(tablePath, true))) {
-            for (String[] list : line) {
-                List<String> alist = Arrays.asList(list);
-                bw.append("\n");
-                bw.append(alist.stream().map(Object::toString).collect(Collectors.joining(PRIMARY_DELIMITER)));
+        try(BufferedWriter bw=new BufferedWriter(new FileWriter(tablePath,true))){
+            for(String[] list:line) {
+                List<String> alist=Arrays.asList(list);
+               bw.append("\n");
+               bw.append(alist.stream().map(Object::toString).collect(Collectors.joining(PRIMARY_DELIMITER)));
+               DatabaseAnalytics.INSERT_QUERY_COUNT++;
             }
         } catch (IOException e) {
             e.printStackTrace();

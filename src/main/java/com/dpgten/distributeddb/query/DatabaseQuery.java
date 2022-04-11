@@ -1,5 +1,6 @@
 package com.dpgten.distributeddb.query;
 
+import com.dpgten.distributeddb.analytics.DatabaseAnalytics;
 import com.dpgten.distributeddb.utils.FileResourceUtils;
 import com.dpgten.distributeddb.utils.MetadataUtils;
 import lombok.AllArgsConstructor;
@@ -25,6 +26,8 @@ public class DatabaseQuery {
     File server2;
     String database1Path;
     String database2Path;
+    DatabaseAnalytics databaseAnalytics = new DatabaseAnalytics();
+
 
     FileResourceUtils fileResourceUtils = new FileResourceUtils();
     MetadataUtils metadataUtils = new MetadataUtils();
@@ -49,6 +52,7 @@ public class DatabaseQuery {
                 database.mkdir();
 //                fileResourceUtils.appendToFile(database, "VM1|")
                 System.out.println("database " + databaseName + " Created.");
+                databaseAnalytics.setDATABASE_QUERY_COUNT(databaseAnalytics.DATABASE_QUERY_COUNT+1);
             } else {
                 System.out.println("database " + databaseName + " already exists");
             }
